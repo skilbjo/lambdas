@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+app="us-athena-updater"
+
+test_code() {
+  aws lambda invoke \
+    --invocation-type Event \
+    --region us-east-1 \
+    --function-name "$app" \
+    --payload file://dev-resources/event \
+    --profile default \
+  dev-resources/response
+}
+
+
+test_code && cat dev-resources/response
+
