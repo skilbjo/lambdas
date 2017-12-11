@@ -62,9 +62,52 @@ project_clj(){
     mv temp "${app}/project.clj"
 }
 
+src_files_clj(){
+  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/jobs/equities.clj"
+  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/jobs/currency.clj"
+  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/jobs/economics.clj"
+  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/jobs/interest_rates.clj"
+  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/jobs/real_estate.clj"
+
+  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/markets_etl/api.clj"
+  sed -i '' 's/ env / util\/decrypt /g' "${app}/src/markets_etl/sql.clj"
+}
+
+add_aws_lambda_clj(){
+  local file='(ns jobs.aws-lambda
+  (:require [clojure.data.json :as json]
+            [clojure.java.io :as io]
+            [jobs.currency :as currency]
+            [jobs.economics :as economics]
+            [jobs.equities :as equities]
+            [jobs.interest-rates :as interest-rates]
+            [jobs.real-estate :as real-estate]
+            [markets-etl.util :as util])
+  (:gen-class
+    :name "jobs.aws-lambda"
+    :implements [com.amazonaws.services.lambda.runtime.RequestStreamHandler]))
+
+(defn main []
+  (currency/-main)
+  (economics/-main)
+  (equities/-main)
+  (interest-rates/-main)
+  (real-estate/-main))
+
+(defn -handleRequest [_ event _ context]
+  (-> event
+      io/reader
+      util/print-it
+      (json/read :key-fn keyword)
+      util/print-it))'
+
+      echo "$file" >>src/jobs/aws_lambda.clj
+}
+
 add_lambda_wrappers(){
   util_clj
   project_clj
+  src_files_clj
 }
 
 

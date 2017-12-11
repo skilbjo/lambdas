@@ -1,11 +1,31 @@
+# markets-etl lambda
 
-```clojure
-(defn- decrypt [ciphertext]
-  (let [decoder (Base64/getDecoder)
-        decoded-text (.decode decoder ciphertext)
-        kms-client (AWSKMSClientBuilder/defaultClient)
-        decode-request (doto (DecryptRequest.)
-                         (.withCiphertextBlob (ByteBuffer/wrap decoded-text)))
-        decode-response (.decrypt kms-client decode-request)]
-    (.toString (.decode (Charset/forName "UTF-8") (.getPlaintext decode-response)))))
+## what
+
+markets-etl, but in lambda form
+
+## build
+
+run deploy/build-project
+
+## events
+
+- cloudwatch rules/schedule, run once a day
+
+payload:
+
+```json
+{
+  "version": "0",
+  "id": "89d1a02d-5ec7-412e-82f5-13505f849b41",
+  "detail-type": "Scheduled Event",
+  "source": "aws.events",
+  "account": "123456789012",
+  "time": "2016-12-30T18:44:49Z",
+  "region": "us-east-1",
+  "resources": [
+    "arn:aws:events:us-east-1:123456789012:rule/SampleRule"
+  ],
+  "detail": {}
+}
 ```
