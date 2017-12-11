@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+app=$(basename $(dirname $dir))
+src_dir="/Users/skilbjo/dev/markets-etl"
+
+cd "${dir}/../../"                   # now in ~/dev/lambdas/
+
+cleanup(){
+  if [[ -f ${app}/project.clj ]]; then rm -f ${app}/project.clj; fi
+  if [[ -d ${app}/src         ]]; then rm -r ${app}/src; fi
+}
+
+copy_files(){
+  cleanup
+
+  cp "${src_dir}/project.clj"  "${app}/project.clj"
+  cp -r "${src_dir}/src"       "${app}/src"
+}
+
+util_clj(){
+  sed -i '' -e '1,5d;' "${app}/src/markets_etl/util.clj"
+
+  local header='(ns markets-etl.util
+  (:require [clj-time.core :as time]
+            [clj-time.coerce :as coerce]
+            [clojure.pprint :as pprint]
+            [clojure.string :as string])
+  (:import [java.util Base64]
+           (java.nio ByteBuffer)
+           (java.nio.charset Charset)
+           [com.amazonaws.services.kms AWSKMS AWSKMSClientBuilder]
+           [com.amazonaws.services.kms.model DecryptRequest]))'
+
+  echo "$header" | cat - "${app}/src/markets_etl/util.clj" >temp && \
+    mv temp "${app}/src/markets_etl/util.clj"
+
+  local decrypt='
+(defn decrypt [ciphertext]
+  (let [decoder (Base64/getDecoder)
+        decoded-text (.decode decoder ciphertext)
+        kms-client (AWSKMSClientBuilder/defaultClient)
+        decode-request (doto (DecryptRequest.)
+                         (.withCiphertextBlob (ByteBuffer/wrap decoded-text)))
+        decode-response (.decrypt kms-client decode-request)]
+    (.toString (.decode (Charset/forName "UTF-8") (.getPlaintext decode-response)))))'
+
+  echo "$decrypt" >>"${app}/src/markets_etl/util.clj"
+}
+
+project_clj(){
+  sed -i '' -e '1,3d;' "${app}/project.clj"
+
+  local header='(defproject markets-etl "0.1.0-SNAPSHOT"
+  :uberjar-name "markets-etl.jar"
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [com.amazonaws/aws-lambda-java-core "1.0.0"]
+                 [com.amazonaws/aws-java-sdk-kms "1.11.98"]'
+
+  echo "$header" | cat - "${app}/project.clj" >temp && \
+    mv temp "${app}/project.clj"
+}
+
+add_lambda_wrappers(){
+  util_clj
+  project_clj
+}
+
+
+copy_files
+add_lambda_wrappers
