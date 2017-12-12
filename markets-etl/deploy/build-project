@@ -35,11 +35,11 @@ util_clj(){
             [clj-time.coerce :as coerce]
             [clojure.pprint :as pprint]
             [clojure.string :as string])
-  (:import [java.util Base64]
+  (:import [com.amazonaws.services.kms AWSKMS AWSKMSClientBuilder]
+           [com.amazonaws.services.kms.model DecryptRequest]
+           [java.util Base64]
            (java.nio ByteBuffer)
-           (java.nio.charset Charset)
-           [com.amazonaws.services.kms AWSKMS AWSKMSClientBuilder]
-           [com.amazonaws.services.kms.model DecryptRequest]))'
+           (java.nio.charset Charset)))'
 
   echo "$header" | cat - "${app}/src/markets_etl/util.clj" >temp && \
     mv temp "${app}/src/markets_etl/util.clj"
@@ -71,14 +71,14 @@ project_clj(){
 }
 
 src_files_clj(){
-  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/jobs/equities.clj"
-  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/jobs/currency.clj"
-  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/jobs/economics.clj"
-  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/jobs/interest_rates.clj"
-  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/jobs/real_estate.clj"
+  sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/equities.clj"
+  sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/currency.clj"
+  sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/economics.clj"
+  sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/interest_rates.clj"
+  sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/real_estate.clj"
 
-  sed -i '' 's/(env /(util\/decrypt /g' "${app}/src/markets_etl/api.clj"
-  sed -i '' 's/ env / util\/decrypt /g' "${app}/src/markets_etl/sql.clj"
+  sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/markets_etl/api.clj"
+  sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/markets_etl/sql.clj"
 }
 
 add_lambda_wrappers(){

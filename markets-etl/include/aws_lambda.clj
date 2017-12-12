@@ -15,10 +15,6 @@
 (defn main []
   (let [_              (println "Starting jobs... ")
 
-        _              (println "Can I see env vars?")
-        _              (println "env/ " (env :jdbc-db-uri))
-        _              (println "System/getenv "(System/getenv "jdbc_db_uri"))
-
         _              (println "Currency... ")
         currency       (currency/-main)
 

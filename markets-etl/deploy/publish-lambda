@@ -50,5 +50,4 @@ new(){
   cleanup
 }
 
-cleanup
-#update
+update
