@@ -1,7 +1,0 @@
-S3: fc-data-team-us
-arn:aws:s3:::fc-data-team-us
-Details
-Suffix: .txt
-Prefix: datalake/pfsc_partitioned
-Event type: ObjectCreatedByPut
-Notification name: bcd5ae2e-0541-464f-9729-ccee1b5dbb36

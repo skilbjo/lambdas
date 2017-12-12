@@ -8,7 +8,9 @@ markets-etl, but in lambda form
 
 run deploy/build-project
 
-## events
+## triggers
+
+### event
 
 - cloudwatch rules/schedule, run once a day
 
@@ -29,3 +31,9 @@ payload:
   "detail": {}
 }
 ```
+
+### setup
+
+<img src="dev-resources/img/cron.png" alt="hi" width="900"/>
+
+<img src="dev-resources/img/lambda.png" alt="hi" width="900"/>

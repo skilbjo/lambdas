@@ -3,7 +3,11 @@ set -eou pipefail
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 app=$(basename $(dirname $dir))
-src_dir="/Users/skilbjo/dev/markets-etl"
+src_dir=''
+case $(whoami) in
+  (skilbjo)         src_dir='/Users/skilbjo/dev/markets-etl' ;;
+  ('john.skilbeck') src_dir='/Users/john.skilbeck/dev/markets-etl' ;;
+esac
 
 cd "${dir}/../../"                   # now in ~/dev/lambdas/
 
@@ -17,6 +21,10 @@ copy_files(){
 
   cp "${src_dir}/project.clj"  "${app}/project.clj"
   cp -r "${src_dir}/src"       "${app}/src"
+}
+
+add_aws_lambda_clj(){
+  cp "${app}/include/aws_lambda.clj" "${app}/src/jobs/aws_lambda.clj"
 }
 
 util_clj(){
@@ -73,43 +81,12 @@ src_files_clj(){
   sed -i '' 's/ env / util\/decrypt /g' "${app}/src/markets_etl/sql.clj"
 }
 
-add_aws_lambda_clj(){
-  local file='(ns jobs.aws-lambda
-  (:require [clojure.data.json :as json]
-            [clojure.java.io :as io]
-            [jobs.currency :as currency]
-            [jobs.economics :as economics]
-            [jobs.equities :as equities]
-            [jobs.interest-rates :as interest-rates]
-            [jobs.real-estate :as real-estate]
-            [markets-etl.util :as util])
-  (:gen-class
-    :name "jobs.aws-lambda"
-    :implements [com.amazonaws.services.lambda.runtime.RequestStreamHandler]))
-
-(defn main []
-  (currency/-main)
-  (economics/-main)
-  (equities/-main)
-  (interest-rates/-main)
-  (real-estate/-main))
-
-(defn -handleRequest [_ event _ context]
-  (-> event
-      io/reader
-      util/print-it
-      (json/read :key-fn keyword)
-      util/print-it))'
-
-      echo "$file" >>src/jobs/aws_lambda.clj
-}
-
 add_lambda_wrappers(){
   util_clj
   project_clj
   src_files_clj
 }
 
-
 copy_files
+add_aws_lambda_clj
 add_lambda_wrappers
