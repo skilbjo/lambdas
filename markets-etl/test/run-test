@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 set -eou pipefail
 
-app="us-athena-updater"
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+app=$(basename $(dirname $dir))
+
+cd "${dir}/.."
 
 test_code() {
-  aws lambda invoke \
+  aws --profile default \
+    lambda invoke \
     --invocation-type Event \
     --region us-east-1 \
-    --function-name "$app" \
-    --payload file://dev-resources/event \
-    --profile default \
-  dev-resources/response
+    --function-name "${app}" \
+    --payload 'file://test/cloudwatch_events_rules' \
+    test/response
 }
 
-
-test_code && cat dev-resources/response
-
+test_code && cat test/response
