@@ -28,11 +28,12 @@ add_aws_lambda_clj(){
 }
 
 util_clj(){
-  sed -i '' -e '1,5d;' "${app}/src/markets_etl/util.clj"
+  sed -i '' -e '1,6d;' "${app}/src/markets_etl/util.clj"
 
   local header='(ns markets-etl.util
   (:require [clj-time.core :as time]
             [clj-time.coerce :as coerce]
+            [clj-time.format :as formatter]
             [clojure.pprint :as pprint]
             [clojure.string :as string])
   (:import [com.amazonaws.services.kms AWSKMS AWSKMSClientBuilder]
@@ -62,7 +63,8 @@ sql_clj(){
 
   local header='
 (ns markets-etl.sql
-  (:require [clojure.string :as string]
+  (:require [amazonica.aws.s3 :as s3]
+            [clojure.string :as string]
             [clojure.data.csv :as csv]
             [clojure.java.jdbc :as jdbc]
             [clojure.java.io :as io]
@@ -132,7 +134,7 @@ sql_clj(){
                                         :metadata    {:server-side-encryption "AES256"}
                                         :file        (str "/tmp/"
                                                           job
-                                                           "csv")))]
+                                                          "csv")))]
     (->> coll
          vectorize
          convert-to-csv
@@ -141,11 +143,15 @@ sql_clj(){
   echo "$athena" >>"${app}/src/markets_etl/sql.clj"
 }
 
+api_clj(){
+  sed -i '' 's/ {:pre/ #_{:pre/g' "${app}/src/markets_etl/api.clj"
+}
+
 project_clj(){
   sed -i '' -e '1,3d;' "${app}/project.clj"
 
   local header='(defproject markets-etl "0.1.0"
-  :uberjar-name "app.jar"
+  :uberjar-name "markets-etl.jar"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [com.amazonaws/aws-lambda-java-core "1.0.0"]
                  [com.amazonaws/aws-java-sdk-kms "1.11.98"]
@@ -157,7 +163,21 @@ project_clj(){
 }
 
 src_files_clj(){
-  new_main='
+  # get ready to replace the -main and execute! for all jobs
+  sed -i '' -e '55,$ d' "${app}/src/jobs/currency.clj"
+  sed -i '' -e '51,$ d' "${app}/src/jobs/economics.clj"
+  sed -i '' -e '51,$ d' "${app}/src/jobs/equities.clj"
+  sed -i '' -e '69,$ d' "${app}/src/jobs/interest_rates.clj"
+  sed -i '' -e '69,$ d' "${app}/src/jobs/real_estate.clj"
+
+  new_entrypoint='
+(defn execute! [data]
+  (->> data
+       (map prepare-row)
+       flatten
+       (sql/insert-to-athena (-> *ns* str (string/split #"\.") second))
+       doall))
+
 (defn -main [& args]
   (let [get-data (fn [{:keys [dataset
                               ticker]}]
@@ -173,23 +193,16 @@ src_files_clj(){
 
     (execute! data)))'
 
-  echo 'Figure out a way to replace with the new main here... '
-  echo 'sed the existing main out, and replace with this '
+  declare -a _jobs=("currency" "economics" "equities" "interest_rates" "real_estate")
 
-  # works for all jobs
-  new_execute='
-(defn execute! [data]
-  (->> data
-       (map prepare-row)
-       flatten
-       (sql/insert-to-athena (-> *ns* str (string/split #"\.") second))
-       doall)))'
+  for _job in "${_jobs[@]}"; do
+    echo -e "$new_entrypoint" >>"${app}/src/jobs/$_job.clj"
+  done
 
-  echo 'Now Figure out a way to replace with the new execute! here... '
-
-  sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/equities.clj"
+  # wrap decrypt
   sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/currency.clj"
   sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/economics.clj"
+  sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/equities.clj"
   sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/interest_rates.clj"
   sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/real_estate.clj"
 
@@ -199,6 +212,7 @@ src_files_clj(){
 
 add_lambda_wrappers(){
   sql_clj
+  api_clj
   util_clj
   project_clj
   src_files_clj
