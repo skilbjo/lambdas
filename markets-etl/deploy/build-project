@@ -60,9 +60,6 @@ util_clj(){
 sql_clj(){
   sed -i '' -e '1,6d;' "${app}/src/markets_etl/sql.clj"
 
-  echo "$header" | cat - "${app}/src/markets_etl/sql.clj" >temp && \
-    mv temp "${app}/src/markets_etl/sql.clj"
-
   local header='
 (ns markets-etl.sql
   (:require [clojure.string :as string]
@@ -70,16 +67,57 @@ sql_clj(){
             [clojure.java.jdbc :as jdbc]
             [clojure.java.io :as io]
             [environ.core :refer [env]]
-            [markets-etl.util :as util]
-            [semantic-csv.core :as sc])
+            [markets-etl.util :as util])
   (:import [java.sql DriverManager]))'
 
+  echo "$header" | cat - "${app}/src/markets_etl/sql.clj" >temp && \
+    mv temp "${app}/src/markets_etl/sql.clj"
+
   athena='
+; https://github.com/metasoarous/semantic-csv/blob/master/src/semantic_csv/impl/core.cljc#L24
+(defn stringify-keyword [x]
+  (cond
+    (string? x)   x
+    (keyword? x)  (->> x str (drop 1) (apply str))
+    :else         (str x)))
+
+; https://github.com/metasoarous/semantic-csv/blob/master/src/semantic_csv/transducers.cljc#L361
+(defn vectorize*
+  ([]
+   (vectorize* {}))
+  ([{:keys [header prepend-header format-header]
+     :or {prepend-header true format-header stringify-keyword}}]
+   (fn [rf]
+     (let [hdr (volatile! header)
+           prepend-hdr (volatile! prepend-header)]
+       (fn
+         ([] (rf))
+         ([result] (rf result))
+         ([result input]
+          (when (empty? @hdr)
+            (do (vreset! hdr (into [] (keys input)))))
+          (if @prepend-hdr
+            (do (vreset! prepend-hdr false)
+              (rf
+                 (if format-header
+                   (rf result (mapv format-header @hdr))
+                   (rf result @hdr))
+                 (mapv (partial get input) @hdr)))
+            (rf result (mapv (partial get input) @hdr)))))))))
+
+; https://github.com/metasoarous/semantic-csv/blob/master/src/semantic_csv/core.cljc#L375
+(defn vectorize
+  ([rows]
+   (vectorize {} rows))
+  ([opts rows]
+   (sequence (vectorize* opts) rows)))
+
 (defn insert-to-athena [job coll]
   (let [convert-to-csv (fn [row]
                          (io/delete-file (str "/tmp/"
                                               job
-                                              ".csv"))
+                                              ".csv")
+                                         true)
                          (with-open [writer (io/writer (str "/tmp/"
                                                             job
                                                             ".csv"))]
@@ -96,7 +134,7 @@ sql_clj(){
                                                           job
                                                            "csv")))]
     (->> coll
-         sc/vectorize
+         vectorize
          convert-to-csv
          s3-put)))'
 
@@ -112,8 +150,7 @@ project_clj(){
                  [com.amazonaws/aws-lambda-java-core "1.0.0"]
                  [com.amazonaws/aws-java-sdk-kms "1.11.98"]
                  [amazonica "0.3.117" :exclusions [com.amazonaws/aws-java-sdk]]
-                 [org.clojure/data.csv "0.1.4"]
-                 [semantic-csv "0.2.1-alpha1"]'
+                 [org.clojure/data.csv "0.1.4"]'
 
   echo "$header" | cat - "${app}/project.clj" >temp && \
     mv temp "${app}/project.clj"
@@ -137,6 +174,7 @@ src_files_clj(){
     (execute! data)))'
 
   echo 'Figure out a way to replace with the new main here... '
+  echo 'sed the existing main out, and replace with this '
 
   # works for all jobs
   new_execute='
@@ -144,9 +182,10 @@ src_files_clj(){
   (->> data
        (map prepare-row)
        flatten
-       sql/insert-to-athena
+       (sql/insert-to-athena (-> *ns* str (string/split #"\.") second))
        doall)))'
-  echo 'Figure out a way to replace with the new execute! here... '
+
+  echo 'Now Figure out a way to replace with the new execute! here... '
 
   sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/equities.clj"
   sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/currency.clj"
