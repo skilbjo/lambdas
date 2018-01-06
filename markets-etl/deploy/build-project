@@ -124,7 +124,7 @@ sql_clj(){
                                                             job
                                                             ".csv"))]
                            (csv/write-csv writer row)))
-        s3-put         (fn []
+        s3-put         (fn [job]
                          (s3/put-object :bucket-name "skilbjo-data"
                                         :key         (str "datalake/"
                                                           job
@@ -137,8 +137,9 @@ sql_clj(){
                                                           "csv")))]
     (->> coll
          vectorize
-         convert-to-csv
-         s3-put)))'
+         convert-to-csv)
+
+    (s3-put job)))'
 
   echo "$athena" >>"${app}/src/markets_etl/sql.clj"
 }
@@ -175,7 +176,7 @@ src_files_clj(){
   (->> data
        (map prepare-row)
        flatten
-       (sql/insert-to-athena (-> *ns* str (string/split #"\.") second))
+       (sql/insert-to-athena (-> *ns* ns-name str (string/split #"\.") second))
        doall))
 
 (defn -main [& args]
