@@ -134,7 +134,7 @@ sql_clj(){
                                         :metadata    {:server-side-encryption "AES256"}
                                         :file        (str "/tmp/"
                                                           job
-                                                          "csv")))]
+                                                          ".csv")))]
     (->> coll
          vectorize
          convert-to-csv)
