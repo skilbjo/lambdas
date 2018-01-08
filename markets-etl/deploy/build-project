@@ -126,7 +126,7 @@ sql_clj(){
                            (csv/write-csv writer row)))
         s3-put         (fn [job]
                          (s3/put-object :bucket-name "skilbjo-data"
-                                        :key         (str "datalake/"
+                                        :key         (str "datalake/markets-etl/"
                                                           job
                                                           "/s3uploaddate="
                                                           util/now
@@ -139,13 +139,17 @@ sql_clj(){
          vectorize
          convert-to-csv)
 
-    (s3-put job)))'
+    (if (empty? (first coll))
+      '"'"'()  ; this is a quoted empty list, ie exit early
+      (s3-put job))))'
 
   echo "$athena" >>"${app}/src/markets_etl/sql.clj"
 }
 
 api_clj(){
-  sed -i '' 's/ {:pre/ #_{:pre/g' "${app}/src/markets_etl/api.clj"
+  # fixed in https://github.com/skilbjo/markets-etl/pull/13
+  #sed -i '' 's/ {:pre/ #_{:pre/g' "${app}/src/markets_etl/api.clj"
+  echo ''
 }
 
 project_clj(){
@@ -197,7 +201,14 @@ src_files_clj(){
   declare -a _jobs=("currency" "economics" "equities" "interest_rates" "real_estate")
 
   for _job in "${_jobs[@]}"; do
+    # change to 3 days ago for everything since we don't want to clobber athena queries
+    sed -i '' "s/:start_date.*/:start_date util\/three-days-ago/g" "${app}/src/jobs/${_job}.clj"
+    sed -i '' "s/:end_date.*/:end_date util\/three-days-ago})/g" "${app}/src/jobs/${_job}.clj"
+
+    # new entrypoint
     echo -e "$new_entrypoint" >>"${app}/src/jobs/${_job}.clj"
+
+    # inject name of the file for the csv file name
     sed -i '' "s/\*ns\*/\"jobs\.${_job}\"/g" "${app}/src/jobs/${_job}.clj"
   done
 
