@@ -28,11 +28,12 @@ add_aws_lambda_clj(){
 }
 
 util_clj(){
-  sed -i '' -e '1,5d;' "${app}/src/markets_etl/util.clj"
+  sed -i '' -e '1,6d;' "${app}/src/markets_etl/util.clj"
 
   local header='(ns markets-etl.util
   (:require [clj-time.core :as time]
             [clj-time.coerce :as coerce]
+            [clj-time.format :as formatter]
             [clojure.pprint :as pprint]
             [clojure.string :as string])
   (:import [com.amazonaws.services.kms AWSKMS AWSKMSClientBuilder]
@@ -57,23 +58,153 @@ util_clj(){
   echo "$decrypt" >>"${app}/src/markets_etl/util.clj"
 }
 
+sql_clj(){
+  sed -i '' -e '1,6d;' "${app}/src/markets_etl/sql.clj"
+
+  local header='
+(ns markets-etl.sql
+  (:require [amazonica.aws.s3 :as s3]
+            [clojure.string :as string]
+            [clojure.data.csv :as csv]
+            [clojure.java.jdbc :as jdbc]
+            [clojure.java.io :as io]
+            [environ.core :refer [env]]
+            [markets-etl.util :as util])
+  (:import [java.sql DriverManager]))'
+
+  echo "$header" | cat - "${app}/src/markets_etl/sql.clj" >temp && \
+    mv temp "${app}/src/markets_etl/sql.clj"
+
+  athena='
+; https://github.com/metasoarous/semantic-csv/blob/master/src/semantic_csv/impl/core.cljc#L24
+(defn stringify-keyword [x]
+  (cond
+    (string? x)   x
+    (keyword? x)  (->> x str (drop 1) (apply str))
+    :else         (str x)))
+
+; https://github.com/metasoarous/semantic-csv/blob/master/src/semantic_csv/transducers.cljc#L361
+(defn vectorize*
+  ([]
+   (vectorize* {}))
+  ([{:keys [header prepend-header format-header]
+     :or {prepend-header true format-header stringify-keyword}}]
+   (fn [rf]
+     (let [hdr (volatile! header)
+           prepend-hdr (volatile! prepend-header)]
+       (fn
+         ([] (rf))
+         ([result] (rf result))
+         ([result input]
+          (when (empty? @hdr)
+            (do (vreset! hdr (into [] (keys input)))))
+          (if @prepend-hdr
+            (do (vreset! prepend-hdr false)
+              (rf
+                 (if format-header
+                   (rf result (mapv format-header @hdr))
+                   (rf result @hdr))
+                 (mapv (partial get input) @hdr)))
+            (rf result (mapv (partial get input) @hdr)))))))))
+
+; https://github.com/metasoarous/semantic-csv/blob/master/src/semantic_csv/core.cljc#L375
+(defn vectorize
+  ([rows]
+   (vectorize {} rows))
+  ([opts rows]
+   (sequence (vectorize* opts) rows)))
+
+(defn insert-to-athena [job coll]
+  (let [convert-to-csv (fn [row]
+                         (io/delete-file (str "/tmp/"
+                                              job
+                                              ".csv")
+                                         true)
+                         (with-open [writer (io/writer (str "/tmp/"
+                                                            job
+                                                            ".csv"))]
+                           (csv/write-csv writer row)))
+        s3-put         (fn [job]
+                         (s3/put-object :bucket-name "skilbjo-data"
+                                        :key         (str "datalake/"
+                                                          job
+                                                          "/s3uploaddate="
+                                                          util/now
+                                                          "/file.csv")
+                                        :metadata    {:server-side-encryption "AES256"}
+                                        :file        (str "/tmp/"
+                                                          job
+                                                          ".csv")))]
+    (->> coll
+         vectorize
+         convert-to-csv)
+
+    (s3-put job)))'
+
+  echo "$athena" >>"${app}/src/markets_etl/sql.clj"
+}
+
+api_clj(){
+  sed -i '' 's/ {:pre/ #_{:pre/g' "${app}/src/markets_etl/api.clj"
+}
+
 project_clj(){
   sed -i '' -e '1,3d;' "${app}/project.clj"
 
-  local header='(defproject markets-etl "0.1.0-SNAPSHOT"
+  local header='(defproject markets-etl "0.1.0"
   :uberjar-name "markets-etl.jar"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [com.amazonaws/aws-lambda-java-core "1.0.0"]
-                 [com.amazonaws/aws-java-sdk-kms "1.11.98"]'
+                 [com.amazonaws/aws-java-sdk-kms "1.11.98"]
+                 [amazonica "0.3.117" :exclusions [com.amazonaws/aws-java-sdk]]
+                 [org.clojure/data.csv "0.1.4"]'
 
   echo "$header" | cat - "${app}/project.clj" >temp && \
     mv temp "${app}/project.clj"
 }
 
 src_files_clj(){
-  sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/equities.clj"
+  # get ready to replace the -main and execute! for all jobs
+  sed -i '' -e '55,$ d' "${app}/src/jobs/currency.clj"
+  sed -i '' -e '51,$ d' "${app}/src/jobs/economics.clj"
+  sed -i '' -e '51,$ d' "${app}/src/jobs/equities.clj"
+  sed -i '' -e '69,$ d' "${app}/src/jobs/interest_rates.clj"
+  sed -i '' -e '69,$ d' "${app}/src/jobs/real_estate.clj"
+
+  new_entrypoint='
+(defn execute! [data]
+  (->> data
+       (map prepare-row)
+       flatten
+       (sql/insert-to-athena (-> *ns* str (string/split #"\.") second))
+       doall))
+
+(defn -main [& args]
+  (let [get-data (fn [{:keys [dataset
+                              ticker]}]
+                   (->> ticker
+                        (map (fn [tkr]
+                               (-> (api/query-quandl! dataset
+                                                      tkr
+                                                      query-params)
+                                   (assoc :dataset dataset :ticker tkr))))))
+        data        (->> datasets
+                         (map get-data)
+                         flatten)]
+
+    (execute! data)))'
+
+  declare -a _jobs=("currency" "economics" "equities" "interest_rates" "real_estate")
+
+  for _job in "${_jobs[@]}"; do
+    echo -e "$new_entrypoint" >>"${app}/src/jobs/${_job}.clj"
+    sed -i '' "s/\*ns\*/\"jobs\.${_job}\"/g" "${app}/src/jobs/${_job}.clj"
+  done
+
+  # wrap decrypt
   sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/currency.clj"
   sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/economics.clj"
+  sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/equities.clj"
   sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/interest_rates.clj"
   sed -i '' 's/ env/ env util\/decrypt/g' "${app}/src/jobs/real_estate.clj"
 
@@ -82,6 +213,8 @@ src_files_clj(){
 }
 
 add_lambda_wrappers(){
+  sql_clj
+  api_clj
   util_clj
   project_clj
   src_files_clj
