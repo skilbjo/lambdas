@@ -30,6 +30,11 @@
         _              (println "Real estate... ")
         real-estate    (real-estate/-main)
 
+        _              (println "Notifying healthchecks.io ... ")
+        _              (util/notify-healthchecks.io (-> :healthchecks-io-api-key
+                                                        env
+                                                        util/decrypt))
+
         _              (println "Finished!")]))
 
 (defn -handleRequest [_ event _ context]

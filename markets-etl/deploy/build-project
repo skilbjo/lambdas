@@ -28,10 +28,11 @@ add_aws_lambda_clj(){
 }
 
 util_clj(){
-  sed -i '' -e '1,6d;' "${app}/src/markets_etl/util.clj"
+  sed -i '' -e '1,7d;' "${app}/src/markets_etl/util.clj"
 
   local header='(ns markets-etl.util
-  (:require [clj-time.core :as time]
+  (:require [clj-http.client :as http]
+            [clj-time.core :as time]
             [clj-time.coerce :as coerce]
             [clj-time.format :as formatter]
             [clojure.pprint :as pprint]
@@ -46,6 +47,7 @@ util_clj(){
     mv temp "${app}/src/markets_etl/util.clj"
 
   local decrypt='
+; -- aws -----------------------------------------------
 (defn decrypt [ciphertext]
   (let [decoder (Base64/getDecoder)
         decoded-text (.decode decoder ciphertext)
