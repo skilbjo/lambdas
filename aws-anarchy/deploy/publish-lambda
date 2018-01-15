@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+app=$(basename $(dirname $dir))
+
+cd "${dir}/.."
+
+build() {
+  lein uberjar && \
+    cp "target/${app}.jar" app.jar
+}
+
+cleanup() {
+  if [[ -f app.jar     ]]; then rm    app.jar; fi
+  if [[ -d target      ]]; then rm -r target;  fi
+}
+
+update() {
+  build
+
+  aws --profile personal \
+    lambda update-function-code  \
+    --region us-east-1 \
+    --function-name "${app}_update-athena" \
+    --zip-file 'fileb://app.jar'
+
+  cleanup
+}
+
+new(){
+  build
+
+  aws --profile personal \
+    lambda create-function \
+    --region us-east-1 \
+    --function-name "${app}_update-athena" \
+    --zip-file 'fileb://app.jar' \
+    --role arn:aws:iam::470340682667:role/lambda_with_athena \
+    --handler "jobs.update-athena" \
+    --runtime java8 \
+    --profile default \
+    --timeout 10 \
+    --memory-size 360
+
+  cleanup
+}
+
+update

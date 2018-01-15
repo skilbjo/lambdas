@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+app=$(basename $(dirname $dir))
+
+cd "${dir}/.."
+
+test_code() {
+  aws --profile default \
+    lambda invoke \
+    --invocation-type Event \
+    --region us-east-1 \
+    --function-name "${app}" \
+    --payload 'file://test/s3_event' \
+    test/response
+}
+
+test_code && cat test/response
