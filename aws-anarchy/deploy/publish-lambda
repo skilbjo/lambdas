@@ -8,7 +8,7 @@ cd "${dir}/.."
 
 build() {
   lein uberjar && \
-    cp "target/${app}.jar" app.jar
+    cp "target/uberjar/${app}.jar" app.jar
 }
 
 cleanup() {

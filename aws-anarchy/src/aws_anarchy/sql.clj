@@ -18,7 +18,7 @@
 
 (defn get-athena-conn []
   (DriverManager/getConnection
-   (env :jdbc-athena-uri)
+   (-> :jdbc-athena-uri env util/decrypt)
    (doto (Properties.)
      (.put "user"           (-> :aws-access-key-id env util/decrypt))
      (.put "password"       (-> :aws-secret-access-key env util/decrypt))
