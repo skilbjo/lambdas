@@ -34,7 +34,13 @@
         _              (println "Finished!")]))
 
 (defn -handleRequest [_ event _ context]
-  (let [event' (-> event
-                   io/reader
-                   (json/read :key-fn keyword))]
+  (let [sns->s3   (fn [sns]
+                    (-> sns :Records first :sns :message))
+        s3        (-> event
+                      io/reader
+                      (json/read :key-fn keyword)
+                      sns->s3)
+        event'    (-> s3
+                      io/reader
+                      (json/read :key-fn keyword))]
     (main event')))
