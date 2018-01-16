@@ -7,7 +7,7 @@
    :name "jobs.update-athena"
    :implements [com.amazonaws.services.lambda.runtime.RequestStreamHandler]))
 
-(defn- event-details [event]
+(defn- s3->m [event]
   (let [object-key  (-> event :Records first :s3 :object :key)
         [_ table]   (re-find #"[^\/]+\/[^\/]+\/([^\/]+)\/.*"
                              object-key)
@@ -24,8 +24,7 @@
 (defn main [event]
   (let [_       (println "Starting to update athena ... ")
         table   (-> event
-                    event-details
-                    util/print-it
+                    s3->m
                     :table)
         _       (println "Running msck repair table on " table)
         results (util/exponential-backoff 1 2 180
