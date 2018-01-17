@@ -23,6 +23,8 @@
 
 (defn main [event]
   (let [_       (println "Starting to update athena ... ")
+        _ (println "event is ... ")
+        _ (println event)
         table   (-> event
                     s3->m
                     :table)
@@ -33,14 +35,26 @@
                                                               :table table}))
         _              (println "Finished!")]))
 
+; S3 trigger only
+#_(defn -handleRequest [_ event _ context]
+  (let [event' (-> event
+                   io/reader
+                   (json/read :key-fn keyword))]
+    (main event')))
+
+; SNS trigger only
 (defn -handleRequest [_ event _ context]
-  (let [sns->s3   (fn [sns]
-                    (-> sns :Records first :sns :message))
+  (let [
+        _ (println "Starting ... ")
+        sns->s3   (fn [sns]
+                    (-> sns :records first :sns :message))
         s3        (-> event
                       io/reader
-                      (json/read :key-fn keyword)
+                      (json/read :key-fn (fn [k] (-> k .toLowerCase keyword)))
                       sns->s3)
+        _ (println "s3 is ... ")
+        _ (println s3)
+
         event'    (-> s3
-                      io/reader
-                      (json/read :key-fn keyword))]
+                      #_(json/read :key-fn (fn [k] (-> k .toLowerCase keyword))))]
     (main event')))
