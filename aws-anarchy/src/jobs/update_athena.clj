@@ -35,10 +35,10 @@
 
 ; S3 trigger only
 #_(defn -handleRequest [_ event _ context]
-  (let [event' (-> event
-                   io/reader
-                   (json/read :key-fn (fn [k] (-> k .toLowerCase keyword))))]
-    (main event')))
+    (let [event' (-> event
+                     io/reader
+                     (json/read :key-fn (fn [k] (-> k .toLowerCase keyword))))]
+      (main event')))
 
 ; SNS trigger only
 (defn -handleRequest [_ event _ context]
