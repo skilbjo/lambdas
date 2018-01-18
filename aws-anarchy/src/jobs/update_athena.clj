@@ -56,5 +56,7 @@
         _ (println s3)
 
         event'    (-> s3
-                      #_(json/read :key-fn (fn [k] (-> k .toLowerCase keyword))))]
+                      (json/read-str :key-fn (fn [k] (-> k .toLowerCase keyword))))
+        _ (println " event' is ... " event')
+        ]
     (main event')))
