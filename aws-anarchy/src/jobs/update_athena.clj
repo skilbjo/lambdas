@@ -8,10 +8,10 @@
    :implements [com.amazonaws.services.lambda.runtime.RequestStreamHandler]))
 
 (defn- s3->m [event]
-  (let [object-key  (-> event :Records first :s3 :object :key)
+  (let [object-key  (-> event :records first :s3 :object :key)
         [_ table]   (re-find #"[^\/]+\/[^\/]+\/([^\/]+)\/.*"
                              object-key)
-        bucket      (-> event :Records first :s3 :bucket :name)
+        bucket      (-> event :records first :s3 :bucket :name)
         fullpath    (str "s3://"
                          bucket
                          "/"
@@ -33,14 +33,21 @@
                                                               :table table}))
         _              (println "Finished!")]))
 
+; S3 trigger only
+#_(defn -handleRequest [_ event _ context]
+  (let [event' (-> event
+                   io/reader
+                   (json/read :key-fn (fn [k] (-> k .toLowerCase keyword))))]
+    (main event')))
+
+; SNS trigger only
 (defn -handleRequest [_ event _ context]
   (let [sns->s3   (fn [sns]
-                    (-> sns :Records first :sns :message))
+                    (-> sns :records first :sns :message))
         s3        (-> event
                       io/reader
-                      (json/read :key-fn keyword)
+                      (json/read :key-fn (fn [k] (-> k .toLowerCase keyword)))
                       sns->s3)
         event'    (-> s3
-                      io/reader
-                      (json/read :key-fn keyword))]
+                      (json/read-str :key-fn (fn [k] (-> k .toLowerCase keyword))))]
     (main event')))

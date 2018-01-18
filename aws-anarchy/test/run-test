@@ -7,13 +7,26 @@ app=$(basename $(dirname $dir))
 cd "${dir}/.."
 
 test_code() {
-  aws --profile default \
+  # for S3 trigger
+    #--payload 'file://test/s3_event' \
+
+  # for SNS trigger
+    #--payload 'file://test/sns_event' \
+  aws --profile personal \
     lambda invoke \
     --invocation-type Event \
     --region us-east-1 \
-    --function-name "${app}" \
-    --payload 'file://test/s3_event' \
+    --function-name "${app}_update-athena" \
+    --payload 'file://test/sns_event' \
     test/response
 }
 
-test_code && cat test/response
+#test_code && cat test/response
+
+integration_test(){
+  touch file.csv
+  aws --profile personal s3 cp file.csv s3://skilbjo-data/datalake/markets-etl/test/file.csv
+  rm file.csv
+}
+
+integration_test
