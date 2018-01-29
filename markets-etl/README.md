@@ -1,5 +1,7 @@
 # markets-etl lambda
 
+[![markets-etl_aws](https://healthchecks.io/badge/80da65e9-ff8f-45f1-b75e-109790/yfJXsnyi/markets-etl_aws.svg)](https://healthchecks.io/badge/80da65e9-ff8f-45f1-b75e-109790/yfJXsnyi/markets-etl_aws.svg)
+
 ## what
 
 markets-etl, but in lambda form
