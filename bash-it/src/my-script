@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -eou pipefail
 
-dir='/tmp/bin'
-src_dir='/var/task'
-
-export PATH="${PATH}:/var/task"
 
 setup(){
+  src_dir='/var/task'
+
+  export PATH="${PATH}:${src_dir}"
+
   source "${src_dir}/cpu-info"
 }
 
