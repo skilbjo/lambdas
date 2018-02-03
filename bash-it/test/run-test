@@ -7,13 +7,20 @@ app=$(basename $(dirname $dir))
 cd "${dir}/.."
 
 test_code() {
+    #--payload 'file://test/sns_event' \
   aws lambda invoke \
-    --profile default \
+    --profile personal \
     --invocation-type Event \
     --region us-east-1 \
+    --payload 'file://test/s3_event' \
     --function-name "${app}" \
-    --payload 'file://test/cloudwatch_events_rules' \
-    test/response
+  test/response
 }
+
+integration_test(){
+  echo 'some stuff here'
+}
+
+#integration_test && echo 'Now review the logs on AWS Cloudwatch'
 
 test_code && cat test/response

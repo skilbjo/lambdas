@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+app=$(basename $(dirname $dir))
+
+cd "${dir}/.."
+
+add_awscli(){
+  # https://alestic.com/2016/11/aws-lambda-awscli/
+  tmpdir='tmp'
+  mkdir "$tmpdir"
+  virtualenv="${tmpdir}/virtual-env"
+  zipfile="./../app.zip"
+  (
+    virtualenv $virtualenv
+    set +u
+    source $virtualenv/bin/activate
+    set -u
+    pip install awscli
+  )
+  rsync -va "${virtualenv}/bin/aws" "${tmpdir}/aws"
+  perl -pi -e '$_ = "#!/usr/bin/python\n" if $. == 1' "${tmpdir}/aws"
+  (cd "$tmpdir"; zip -r9 "$zipfile" aws)
+  (cd "${virtualenv/lib/python2.7/site-packages}"; zip -r9 "../${zipfile}" .)
+}
+
+dev(){
+  cd src && \
+    zip -r9 ../app.zip . && \
+    cd ../ && \
+  chmod 744 app.zip
+}
+
+build() {
+  add_awscli
+
+  cd src && \
+    zip -r9 ../app.zip . && \
+    cd ../ && \
+  chmod 744 app.zip
+}
+
+cleanup() {
+  if [[ -d tmp     ]]; then rm -rf tmp; fi
+  if [[ -f app.zip ]]; then rm app.zip; fi
+}
+
+update() {
+  build
+  #dev
+
+  aws lambda update-function-code  \
+    --profile personal \
+    --region us-east-1 \
+    --function-name "${app}" \
+    --zip-file 'fileb://app.zip'
+
+  cleanup
+}
+
+new(){
+  build
+
+  aws lambda create-function \
+    --profile personal \
+    --region us-east-1 \
+    --function-name "${app}" \
+    --zip-file 'fileb://app.zip' \
+    --role arn:aws:iam::470340682667:role/lambda_with_s3 \
+    --handler 'entrypoint.lambda_handler' \
+    --runtime 'python3.6' \
+    --timeout 60 \
+    --memory-size 128
+
+  cleanup
+}
+
+update

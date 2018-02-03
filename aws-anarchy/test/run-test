@@ -12,8 +12,8 @@ test_code() {
 
   # for SNS trigger
     #--payload 'file://test/sns_event' \
-  aws --profile personal \
-    lambda invoke \
+  aws lambda invoke \
+    --profile personal \
     --invocation-type Event \
     --region us-east-1 \
     --function-name "${app}_update-athena" \
