@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+fn(){
+  echo 'Im in a fn'
+}
+
+echo 'hello from bash'
+
+fn
+
+ls /
