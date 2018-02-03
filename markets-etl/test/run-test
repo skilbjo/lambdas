@@ -7,8 +7,8 @@ app=$(basename $(dirname $dir))
 cd "${dir}/.."
 
 test_code() {
-  aws --profile default \
-    lambda invoke \
+  aws lambda invoke \
+    --profile default \
     --invocation-type Event \
     --region us-east-1 \
     --function-name "${app}" \

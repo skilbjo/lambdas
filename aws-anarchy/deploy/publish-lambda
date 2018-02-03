@@ -19,8 +19,8 @@ cleanup() {
 update() {
   build
 
-  aws --profile personal \
-    lambda update-function-code  \
+  aws lambda update-function-code  \
+    --profile personal \
     --region us-east-1 \
     --function-name "${app}_update-athena" \
     --zip-file 'fileb://app.jar'
@@ -31,8 +31,8 @@ update() {
 new(){
   build
 
-  aws --profile personal \
-    lambda create-function \
+  aws lambda create-function \
+    --profile personal \
     --region us-east-1 \
     --function-name "${app}_update-athena" \
     --zip-file 'fileb://app.jar' \
