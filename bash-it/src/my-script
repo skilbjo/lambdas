@@ -4,14 +4,14 @@ set -eou pipefail
 dir='/tmp/bin'
 src_dir='/var/task'
 
-setup(){
-  cp "${src_dir}/cpu-info" "${dir}/"
-  #cp "${src_dir}/aws"      "${dir}/"
+export PATH="${PATH}:/var/task"
 
-  source "${dir}/cpu-info"
+setup(){
+  source "${src_dir}/cpu-info"
 }
 
 setup
-fn
 
-#"${src_dir}/aws" s3 ls
+aws s3 cp s3://skilbjo-data/datalake/markets-etl/currency/s3uploaddate=2018-02-03/file.csv /tmp/
+
+cat /tmp/file.csv

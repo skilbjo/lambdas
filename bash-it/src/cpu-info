@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 set -eou pipefail
 
-#touch: cannot touch ‘/home/sbx_user1069/.aws/credentials’: No such file or directory
-#touch ~/.aws/config ~/.aws/credentials
-#echo "[default]"           >~/.aws/config
-#echo "region = us-east-1"  >>~/.aws/config
-#echo "[default]"           >~/.aws/credentials
-
 fn(){
   echo 'Im in a fn'
 }

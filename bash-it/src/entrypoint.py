@@ -21,10 +21,10 @@ def main():
 
   path = '/tmp/bin'
 
-  _init_bin('aws')
-  _init_bin('my-script')
+  # _init_bin('my-script')
+  # os.system(path+'/my-script')
 
-  os.system(path+'/my-script')
+  os.system('/var/task/my-script')
 
   return print('done!')
 

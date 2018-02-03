@@ -9,6 +9,8 @@ container AWS Lambda confines you to?
 Nominally, uses a python runtime. But that's just an overhead wrapper before we
 drop down into the good stuff.
 
+<img src="dev-resources/img/h4x.png" alt="hi" width="900"/>
+
 ## build
 
 ```bash
