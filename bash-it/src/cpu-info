@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+#touch: cannot touch ‘/home/sbx_user1069/.aws/credentials’: No such file or directory
+#touch ~/.aws/config ~/.aws/credentials
+#echo "[default]"           >~/.aws/config
+#echo "region = us-east-1"  >>~/.aws/config
+#echo "[default]"           >~/.aws/credentials
+
+fn(){
+  echo 'Im in a fn'
+}
+
+cpu_info(){
+  env_vars=$(env)
+  user=$(whoami)
+  kernel=$(uname -a)
+  distro=$(cat /etc/*-release)
+  cores=$(getconf _NPROCESSORS_ONLN 2>/dev/null || getconf NPROCESSORS_ONLN 2>/dev/null || echo 1)
+
+  echo "env vars are: $env_vars"
+  echo "user is $user"
+  echo "kernel is $kernel"
+  echo "distro is $distro"
+  echo "number of cores is: $cores"
+
+  echo '/etc/passwd is:'
+  cat /etc/passwd
+}

@@ -4,43 +4,29 @@ def _init_bin(executable_name):
   import os
   import shutil
 
-  LAMBDA_TASK_ROOT = os.environ.get('LAMBDA_TASK_ROOT', os.path.dirname(os.path.abspath(__file__)))
-  BIN_DIR = '/tmp/bin'
+  lambda_path = os.environ.get('LAMBDA_TASK_ROOT', os.path.dirname(os.path.abspath(__file__)))
+  path = '/tmp/bin'
 
-  if not os.path.exists(BIN_DIR):
-    os.makedirs(BIN_DIR)
+  if not os.path.exists(path): # if warm container, /tmp/bin already created
+    os.makedirs(path)          # if new LXC container, create /tmp/bin
 
-  print('Copying binaries for '+executable_name+' in /tmp/bin')
-  currfile = os.path.join(LAMBDA_TASK_ROOT, executable_name)
-  newfile  = os.path.join(BIN_DIR, executable_name)
+  currfile = os.path.join(lambda_path, executable_name)
+  newfile  = os.path.join(path, executable_name)
 
   shutil.copy2(currfile, newfile)
-  os.system('chmod 755 '+currfile)
 
-  os.system('cat '+currfile)
-  print('Finished catting file')
-
-def main(event,context):
+def main():
   import os
   import subprocess
 
-  BIN_DIR = '/tmp/bin'
+  path = '/tmp/bin'
 
+  _init_bin('aws')
   _init_bin('my-script')
-  cmdline = [os.path.join(BIN_DIR, 'my-script')]
-  subprocess.check_output(cmdline, shell=True, stderr=subprocess.STDOUT)
-  subprocess.check_output(cmdline, shell=False, stderr=subprocess.STDOUT)
-  os.system('/tmp/bin/my-script')
-  os.system('cat /tmp/bin/my-script')
-  print('done!')
-  return 0
+
+  os.system(path+'/my-script')
+
+  return print('done!')
 
 def lambda_handler(event,context):
-  import json
-  try:
-    s3_event = json.loads(event['Records'][0]['Sns']['Message'])
-  except KeyError:
-    s3_event = event
-  except json.decoder.JSONDecodeError:
-    s3_event = event
-  return main(s3_event,context)
+  return main()

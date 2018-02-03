@@ -25,6 +25,13 @@ add_awscli(){
   (cd "${virtualenv/lib/python2.7/site-packages}"; zip -r9 "../${zipfile}" .)
 }
 
+dev(){
+  cd src && \
+    zip -r9 ../app.zip . && \
+    cd ../ && \
+  chmod 744 app.zip
+}
+
 build() {
   add_awscli
 
@@ -41,6 +48,7 @@ cleanup() {
 
 update() {
   build
+  #dev
 
   aws lambda update-function-code  \
     --profile personal \
@@ -59,14 +67,13 @@ new(){
     --region us-east-1 \
     --function-name "${app}" \
     --zip-file 'fileb://app.zip' \
-    --role arn:aws:iam::470340682667:role/lambda_exec_role \
+    --role arn:aws:iam::470340682667:role/lambda_with_s3 \
     --handler 'entrypoint.lambda_handler' \
     --runtime 'python3.6' \
     --timeout 60 \
-    --memory-size 256
+    --memory-size 128
 
   cleanup
 }
 
 update
-

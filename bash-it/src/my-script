@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 set -eou pipefail
 
-fn(){
-  echo 'Im in a fn'
+dir='/tmp/bin'
+src_dir='/var/task'
+
+setup(){
+  cp "${src_dir}/cpu-info" "${dir}/"
+  #cp "${src_dir}/aws"      "${dir}/"
+
+  source "${dir}/cpu-info"
 }
 
-echo 'hello from bash'
-
+setup
 fn
 
-ls /
+#"${src_dir}/aws" s3 ls
