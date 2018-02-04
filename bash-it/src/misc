@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -eou pipefail
 
+aws_works(){
+  echo 'aws works'
+  #aws s3 cp s3://skilbjo-data/datalake/markets-etl/currency/s3uploaddate=2018-02-03/file.csv /tmp/
+  #cat /tmp/file.csv
+}
+
 fn(){
   echo 'Im in a fn'
 }

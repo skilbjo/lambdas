@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+_jq(){
+  # jq added at build time
+  ln -s /var/task/jq /tmp/bin/jq
+
+  # or at runtime
+  #curl -L \
+    #https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 \
+    #-o /tmp/bin/jq
+}
+
+_jsonlint(){
+  # installed at build time. npm cli not available at runtime
+  ln -s /var/task/node_modules/jsonlint/lib/cli.js /tmp/bin/jsonlint
+}
+
+install_dependencies(){
+  bin_dir='/tmp/bin'
+
+  export PATH="${PATH}:${bin_dir}"
+
+  mkdir -p /tmp/bin
+
+  _jq
+  _jsonlint
+
+  chmod u+x /tmp/bin/* || :
+}
