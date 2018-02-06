@@ -8,6 +8,7 @@ setup(){
 
   source "${src_dir}/util"
   source "${src_dir}/misc"
+  source "${src_dir}/athena"
 
   install_dependencies
 }
@@ -24,6 +25,10 @@ echo '{"hi": 1}' | jsonlint
 
 echo 'curl'
 curl https://skilbjo.duckdns.org/api/currency/latest | jsonlint
+
+query "select 1+1 as hello_athena"
+
+which git
 
 #echo 'curl with -k'
 #curl -k https://skilbjo-aws.duckdns.org/api/currency/latest | jq .
