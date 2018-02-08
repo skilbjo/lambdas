@@ -16,6 +16,14 @@ _jsonlint(){
   ln -s /var/task/node_modules/jsonlint/lib/cli.js /tmp/bin/jsonlint
 }
 
+_git(){
+  export GIT_TEMPLATE_DIR='/tmp/usr/share/git-core/templates'
+  export GIT_EXEC_PATH='/tmp/usr/libexec/git-core'
+
+  tar --directory='/tmp' -xf /var/task/git.tar
+  ln -s /tmp/usr/bin/git /tmp/bin/git
+}
+
 install_dependencies(){
   bin_dir='/tmp/bin'
 
@@ -24,7 +32,8 @@ install_dependencies(){
   mkdir -p /tmp/bin
 
   _jq
-  _jsonlint
+  #_jsonlint
+  _git
 
   chmod u+x /tmp/bin/* || :
 }

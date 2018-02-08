@@ -24,6 +24,9 @@ Support exists for cli / binaries in python (`awscli`), nodejs (`jsonlint`), or
 pre-compiled binaries (can either be included in the deployment package at build-
 time (`deploy/publish-lambda:add_bin` fn) or at runtime (`src/util:_jq`).
 
+Git is also an option. Note git is version 2.4.3; and the tar (meant for linux!)
+was downloaded here: <https://github.com/lambci/lambci/tree/master/vendor>
+
 ## build
 ```bash
 deploy/build-project

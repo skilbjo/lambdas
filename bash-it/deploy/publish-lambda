@@ -48,6 +48,7 @@ add_npm(){
 add_bin(){
   # remember, must be built for AWS AMI (not macOS)
 
+  ## jq
   zipfile="$(pwd)/app.zip"
   (
     cd tmp
@@ -58,6 +59,14 @@ add_bin(){
       chmod +x jq
       zip -r9 "$zipfile" jq
     fi
+  )
+
+  ## git
+  (
+    cd tmp
+    cp ../resources/git.tar .
+    ls -l git.tar
+    zip -r9 "$zipfile" git.tar
   )
 }
 
