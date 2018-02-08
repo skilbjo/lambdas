@@ -48,6 +48,7 @@ add_npm(){
 add_bin(){
   # remember, must be built for AWS AMI (not macOS)
 
+  ## jq
   zipfile="$(pwd)/app.zip"
   (
     cd tmp
@@ -59,12 +60,19 @@ add_bin(){
       zip -r9 "$zipfile" jq
     fi
   )
+
+  ## git
+  (
+    cd tmp
+    cp ../resources/git.tar .
+    zip -r9 "$zipfile" jq
+  )
 }
 
 dev(){
   if [[ ! -f app.zip ]]; then
     add_awscli
-    add_npm
+    #add_npm
     add_bin
   fi
 

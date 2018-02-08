@@ -27,3 +27,23 @@ cpu_info(){
   echo '/etc/passwd is:'
   cat /etc/passwd
 }
+
+_jq_example(){
+  echo 'gonna try jq'
+  echo '{"hi": 1}' | jq .
+
+  # seems like the aws call needs -k. the home version doesn't
+  curl -k https://skilbjo-aws.duckdns.org/api/currency/latest | jq .
+}
+
+_jsonlint_example(){
+  echo 'gonna try jsonlint'
+  echo '{"hi": 1}' | jsonlint
+
+  echo 'curl'
+  curl https://skilbjo.duckdns.org/api/currency/latest | jsonlint
+}
+
+_query_athena_example(){
+  query "select 1+1 as hello_athena"
+}

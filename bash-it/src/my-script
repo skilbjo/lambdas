@@ -17,18 +17,10 @@ setup
 
 aws s3 ls
 
-echo 'gonna try jq'
-echo '{"hi": 1}' | jq .
-
-echo 'gonna try jsonlint'
-echo '{"hi": 1}' | jsonlint
-
-echo 'curl'
-curl https://skilbjo.duckdns.org/api/currency/latest | jsonlint
-
-query "select 1+1 as hello_athena"
-
 which git
 
-#echo 'curl with -k'
-#curl -k https://skilbjo-aws.duckdns.org/api/currency/latest | jq .
+cd /tmp
+
+git clone https://github.com/skilbjo/markets-etl.git
+
+ls markets-etl
