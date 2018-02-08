@@ -20,10 +20,8 @@ _git(){
   export GIT_TEMPLATE_DIR='/tmp/usr/share/git-core/templates'
   export GIT_EXEC_PATH='/tmp/usr/libexec/git-core'
 
-  echo 'home is:'
-  echo $HOME
-
-  tar --directory='/tmp' /var/task/git.tar
+  tar --directory='/tmp' -xf /var/task/git.tar
+  ln -s /tmp/usr/bin/git /tmp/bin/git
 }
 
 install_dependencies(){

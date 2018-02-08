@@ -65,14 +65,15 @@ add_bin(){
   (
     cd tmp
     cp ../resources/git.tar .
-    zip -r9 "$zipfile" jq
+    ls -l git.tar
+    zip -r9 "$zipfile" git.tar
   )
 }
 
 dev(){
   if [[ ! -f app.zip ]]; then
     add_awscli
-    #add_npm
+    add_npm
     add_bin
   fi
 

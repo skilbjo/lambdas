@@ -4,7 +4,7 @@ def main():
   import os
   import subprocess
 
-  os.system('/var/task/my-script')
+  os.system('/var/task/run-job')
 
   return print('done!')
 
