@@ -1,7 +1,10 @@
-# bash-it lambda
+# ping-it lambda
+
+See <https://github.com/skilbjo/lambdas/tree/master/bash-it>
 
 ## what
-Hack the github visualization chart.
+Hack the github visualization chart. Set this up with cloudwatch and AWS Lambda,
+Github, and then ...
 
 <img src="dev-resources/img/forget_about_it.png" alt="hi" width="800"/>
 
