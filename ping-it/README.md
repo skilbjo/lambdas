@@ -16,7 +16,12 @@ deploy/build-project
 ```
 
 ## config
-<img src="dev-resources/img/bash_it_config.png" alt="hi" width="900"/>
+### env vars
+```bash
+export github_token_encrypted=''
+export hchk=''
+export slack_api_key=''
+```
 
 ### triggers
 - Cloudwatch (1x/day)
