@@ -3,7 +3,7 @@
 ## what
 Hack the github visualization chart.
 
-<img src="dev-resources/img/h4x.png" alt="hi" width="900"/>
+<img src="dev-resources/img/forget_about_it.png" alt="hi" width="800"/>
 
 ## binaries available
 
