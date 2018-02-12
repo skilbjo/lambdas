@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+app=$(basename $(dirname $dir))
+
+cd "${dir}/.."
+
+test_code() {
+    #--payload 'file://test/sns_event' \
+  aws lambda invoke \
+    --profile personal \
+    --invocation-type Event \
+    --region us-east-1 \
+    --payload 'file://test/cloudwatch_events_rules' \
+    --function-name "${app}" \
+  test/response
+}
+
+integration_test(){
+  echo 'some stuff here'
+}
+
+#integration_test && echo 'Now review the logs on AWS Cloudwatch'
+
+test_code && cat test/response

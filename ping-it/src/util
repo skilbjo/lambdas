@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+_git(){
+  export GIT_TEMPLATE_DIR='/tmp/usr/share/git-core/templates'
+  export GIT_EXEC_PATH='/tmp/usr/libexec/git-core'
+
+  tar --directory='/tmp' -xf /var/task/git.tar
+  ln -s /tmp/usr/bin/git /tmp/bin/git || :
+
+  set +u
+  touch /tmp/.gitconfig
+  export HOME="/tmp"
+  export GIT_CONFIG='/tmp/.gitconfig'
+  set -u
+
+  git config user.name "skilbjo"
+  git config user.email "john.skilbeck@gmail.com"
+  git config push.default simple
+}
+
+install_dependencies(){
+  bin_dir='/tmp/bin'
+
+  export PATH="${PATH}:${bin_dir}"
+
+  mkdir -p /tmp/bin
+
+  _git
+
+  chmod u+x /tmp/bin/* || :
+}
+
+_decrypt_secrets(){
+  # Unable to load paramfile fileb:///dev/fd/63: [Errno 2] No such file or directory: '/dev/fd/63'
+  # aws kms decrypt --ciphertext-blob fileb://<(echo "$ssh_pem" | base64 -d)
+  echo "$github_token_encrypted" | base64 --decode >/tmp/.github_token_encrypted
+
+  if [[ ! -f /tmp/.github_token ]]; then
+    aws kms decrypt \
+      --output text \
+      --query Plaintext \
+      --ciphertext-blob 'fileb:///tmp/.github_token_encrypted' | \
+      base64 --decode \
+      >/tmp/.github_token
+  fi
+
+  export github_token=$(cat /tmp/.github_token)
+}
+
+slack(){
+  local msg="${1}"
+
+  set +e
+  curl -X POST \
+    -H 'Content-type: application/json' \
+    --data '{"text":"'"${msg}"'"}' \
+    https://hooks.slack.com/services/${slack_api_key}
+  set -e
+}

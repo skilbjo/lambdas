@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+setup(){
+  src_dir='/var/task'
+
+  export PATH="${PATH}:${src_dir}"
+
+  source "${src_dir}/util"
+
+  install_dependencies
+  _decrypt_secrets
+}
+
+setup
+
+cd /tmp && git clone https://github.com/skilbjo/ping-it.git
+cd ping-it && deploy/bin/run-job
+git push "https://skilbjo:${github_token}@github.com/skilbjo/ping-it.git"
+cd -
+
+curl -fsS --retry 3 "https://hchk.io/${hchk_ping_it}"
+slack "ping-it: i ran"

@@ -11,16 +11,18 @@ setup(){
   source "${src_dir}/athena"
 
   install_dependencies
+  add_ssh_key
 }
 
 setup
 
 aws s3 ls
 
-which git
+slack "bash-it: i ran"
 
-cd /tmp
+echo 'calling decrypt fn'
+add_ssh_key
 
-git clone https://github.com/skilbjo/markets-etl.git
-
-ls markets-etl
+set +e
+echo 'is there nc?'
+which nc

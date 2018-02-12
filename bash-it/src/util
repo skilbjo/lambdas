@@ -3,7 +3,7 @@ set -eou pipefail
 
 _jq(){
   # jq added at build time
-  ln -s /var/task/jq /tmp/bin/jq
+  ln -s /var/task/jq /tmp/bin/jq || :
 
   # or at runtime
   #curl -L \
@@ -13,7 +13,7 @@ _jq(){
 
 _jsonlint(){
   # installed at build time. npm cli not available at runtime
-  ln -s /var/task/node_modules/jsonlint/lib/cli.js /tmp/bin/jsonlint
+  ln -s /var/task/node_modules/jsonlint/lib/cli.js /tmp/bin/jsonlint || :
 }
 
 _git(){
@@ -21,7 +21,17 @@ _git(){
   export GIT_EXEC_PATH='/tmp/usr/libexec/git-core'
 
   tar --directory='/tmp' -xf /var/task/git.tar
-  ln -s /tmp/usr/bin/git /tmp/bin/git
+  ln -s /tmp/usr/bin/git /tmp/bin/git || :
+
+  set +u
+  touch /tmp/.gitconfig
+  export HOME="/tmp"
+  export GIT_CONFIG='/tmp/.gitconfig'
+  set -u
+
+  git config user.name "skilbjo"
+  git config user.email "john.skilbeck@gmail.com"
+  git config push.default simple
 }
 
 install_dependencies(){
@@ -36,4 +46,33 @@ install_dependencies(){
   _git
 
   chmod u+x /tmp/bin/* || :
+}
+
+add_ssh_key(){
+  # Unable to load paramfile fileb:///dev/fd/63: [Errno 2] No such file or directory: '/dev/fd/63'
+  # aws kms decrypt --ciphertext-blob fileb://<(echo "$ssh_pem" | base64 -d)
+  mkdir -p /tmp/.ssh
+  echo "$ssh_pem" | base64 --decode >/tmp/.ssh/id_rsa_encrypted
+
+  if [[ ! -f /tmp/.ssh/id_rsa ]]; then
+    aws kms decrypt \
+      --output text \
+      --query Plaintext \
+      --ciphertext-blob 'fileb:///tmp/.ssh/id_rsa_encrypted' | \
+      base64 --decode \
+      >/tmp/.ssh/id_rsa
+
+    chmod 400 /tmp/.ssh/id_rsa || :
+  fi
+}
+
+slack(){
+  local msg="${1}"
+
+  set +e
+  curl -X POST \
+    -H 'Content-type: application/json' \
+    --data '{"text":"'"${msg}"'"}' \
+    https://hooks.slack.com/services/${slack_api_key}
+  set -e
 }

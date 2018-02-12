@@ -65,7 +65,6 @@ add_bin(){
   (
     cd tmp
     cp ../resources/git.tar .
-    ls -l git.tar
     zip -r9 "$zipfile" git.tar
   )
 }
