@@ -159,12 +159,11 @@ project_clj(){
 
   local header='(defproject markets-etl "0.1.0"
   :uberjar-name "markets-etl.jar"
-  :dependencies [[org.clojure/clojure "1.8.0"]
+  :dependencies [[org.clojure/clojure "1.9.0"]
                  [com.amazonaws/aws-lambda-java-core "1.0.0"]
                  [com.amazonaws/aws-java-sdk-kms "1.11.98"]
                  [amazonica "0.3.117" :exclusions [com.amazonaws/aws-java-sdk]]
-                 [org.clojure/data.csv "0.1.4"]
-                 [org.slf4j/slf4j-log4j12 "1.6.4"]'
+                 [org.clojure/data.csv "0.1.4"]'
 
   echo "$header" | cat - "${app}/project.clj" >temp && \
     mv temp "${app}/project.clj"
