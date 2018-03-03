@@ -9,7 +9,7 @@
             [jobs.real-estate :as real-estate]
             [markets-etl.util :as util])
   (:gen-class
-    :name "jobs.aws-lambda"
+    :name jobs.aws-lambda
     :implements [com.amazonaws.services.lambda.runtime.RequestStreamHandler]))
 
 (defn main []
@@ -31,7 +31,7 @@
         real-estate    (real-estate/-main)
 
         _              (println "Notifying healthchecks.io ... ")
-        _              (util/notify-healthchecks.io (-> :healthchecks-io-api-key
+        _              (util/notify-healthchecks-io (-> :healthchecks-io-api-key
                                                         env
                                                         util/decrypt))
 
