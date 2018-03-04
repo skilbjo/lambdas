@@ -171,11 +171,11 @@ project_clj(){
 
 src_files_clj(){
   # get ready to replace the -main and execute! for all jobs
-  sed -i '' -e '55,$ d' "${app}/src/jobs/currency.clj"
-  sed -i '' -e '51,$ d' "${app}/src/jobs/economics.clj"
-  sed -i '' -e '109,$ d' "${app}/src/jobs/equities.clj"
-  sed -i '' -e '69,$ d' "${app}/src/jobs/interest_rates.clj"
-  sed -i '' -e '69,$ d' "${app}/src/jobs/real_estate.clj"
+  sed -i '' -e '56,$ d' "${app}/src/jobs/currency.clj"
+  sed -i '' -e '52,$ d' "${app}/src/jobs/economics.clj"
+  sed -i '' -e '90,$ d' "${app}/src/jobs/equities.clj"
+  sed -i '' -e '70,$ d' "${app}/src/jobs/interest_rates.clj"
+  sed -i '' -e '70,$ d' "${app}/src/jobs/real_estate.clj"
 
   new_entrypoint='
 (defn execute! [data]
@@ -187,38 +187,13 @@ src_files_clj(){
 
 (defn -main [& args]
   (error/set-default-error-handler)
-  (let [get-data (fn [{:keys [dataset
-                              ticker]}]
-                   (->> ticker
-                        (map (fn [tkr]
-                               (-> (api/query-quandl! dataset
-                                                      tkr
-                                                      query-params)
-                                   (assoc :dataset dataset :ticker tkr))))))
-        data        (->> datasets
-                         (map get-data)
-                         flatten)]
-
-    (execute! data)))'
-
-    new_entrypoint_equities='
-(defn execute! [data]
-  (->> data
-       (map prepare-row)
-       flatten
-       (sql/insert-to-athena (-> *ns* str (string/split #"\.") second))
-       doall))
-
-(defn -main [& args]
-  (error/set-default-error-handler)
   (let [data        (->> datasets
-                         (map get-data)
+                         (map #(api/get-data % query-params))
                          flatten)]
 
     (execute! data)))'
 
-  declare -a _jobs=("currency" "economics" "interest_rates" "real_estate")
-  declare -a _equities=("equities")
+  declare -a _jobs=("currency" "equities" "economics" "interest_rates" "real_estate")
 
   for _job in "${_jobs[@]}"; do
     # change to 3 days ago for everything since we don't want to clobber athena queries
@@ -227,18 +202,6 @@ src_files_clj(){
 
     # new entrypoint
     echo -e "$new_entrypoint" >>"${app}/src/jobs/${_job}.clj"
-
-    # inject name of the file for the csv file name
-    sed -i '' "s/\*ns\*/\"jobs\.${_job}\"/g" "${app}/src/jobs/${_job}.clj"
-  done
-
-  for _job in "${_equities[@]}"; do
-    # change to 3 days ago for everything since we don't want to clobber athena queries
-    sed -i '' "s/:start_date.*/:start_date util\/three-days-ago/g" "${app}/src/jobs/${_job}.clj"
-    sed -i '' "s/:end_date.*/:end_date util\/three-days-ago})/g" "${app}/src/jobs/${_job}.clj"
-
-    # new entrypoint
-    echo -e "$new_entrypoint_equities" >>"${app}/src/jobs/${_job}.clj"
 
     # inject name of the file for the csv file name
     sed -i '' "s/\*ns\*/\"jobs\.${_job}\"/g" "${app}/src/jobs/${_job}.clj"
