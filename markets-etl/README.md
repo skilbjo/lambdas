@@ -1,18 +1,18 @@
-# markets-etl lambda
+## m a r k e t s - e t l  l a m b d a
 
 [![markets-etl_aws](https://healthchecks.io/badge/80da65e9-ff8f-45f1-b75e-109790/yfJXsnyi/markets-etl_aws.svg)](https://healthchecks.io/badge/80da65e9-ff8f-45f1-b75e-109790/yfJXsnyi/markets-etl_aws.svg)
 
-## what
+### what
 
 markets-etl, but in lambda form
 
-## build
+### build
 
 run deploy/build-project
 
-## triggers
+### triggers
 
-### event
+#### event
 
 - cloudwatch rules/schedule, run once a day
 
@@ -34,13 +34,13 @@ payload:
 }
 ```
 
-### setup
+#### setup
 
 <img src="dev-resources/img/cron.png" alt="hi" width="900"/>
 
 <img src="dev-resources/img/lambda.png" alt="hi" width="900"/>
 
-## aws networking set up
+### aws networking set up
 From [https://gist.github.com/reggi/dc5f2620b7b4f515e68e46255ac042a7](https://gist.github.com/reggi/dc5f2620b7b4f515e68e46255ac042a7)
 
 # How to setup AWS lambda function to talk to the internet and VPC
