@@ -11,7 +11,7 @@ _docker(){
   cd /tmp
 
   # if included at build
-  ln -s /var/task/udocker udocker || :
+  #ln -s /var/task/udocker udocker || :
 
   # only devel branch works
   # if not included at build
@@ -24,11 +24,11 @@ _docker(){
   udocker pull quay.io/skilbjo/iris:x86
 
   # Setup a container
-  python udocker create --name=ubuntu quay.io/skilbjo/iris:x86
-  python udocker setup --execmode=F1 ubuntu
+  python udocker create --name=iris quay.io/skilbjo/iris:x86
+  python udocker setup --execmode=F1 iris
 
   # Run it!
-  python udocker run --nosysdirs ubuntu cat /etc/os-release
+  python udocker run --nosysdirs iris cat /etc/os-release
 }
 
 install_dependencies(){
