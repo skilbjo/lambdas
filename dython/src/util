@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+_docker(){
+  export HOME=/tmp
+  export UDOCKER_DIR=/tmp
+  export UDOCKER_BIN=/tmp
+  export UDOCKER_LIB=/tmp
+  export UDOCKER_CONTAINERS=/tmp
+
+  cd /tmp
+
+  # if included at build
+  ln -s /var/task/udocker udocker || :
+
+  # only devel branch works
+  # if not included at build
+  #curl https://raw.githubusercontent.com/indigo-dc/udocker/devel/udocker.py >udocker
+
+  udocker version
+
+  # Pull image
+  set -x
+  udocker pull quay.io/skilbjo/iris:x86
+
+  # Setup a container
+  python udocker create --name=ubuntu quay.io/skilbjo/iris:x86
+  python udocker setup --execmode=F1 ubuntu
+
+  # Run it!
+  python udocker run --nosysdirs ubuntu cat /etc/os-release
+}
+
+install_dependencies(){
+  bin_dir='/tmp/bin'
+
+  export PATH="${PATH}:${bin_dir}"
+
+  mkdir -p /tmp/bin
+
+  _docker
+
+  chmod u+x /tmp/bin/* || :
+}
+
+_decrypt_secrets(){
+  # Unable to load paramfile fileb:///dev/fd/63: [Errno 2] No such file or directory: '/dev/fd/63'
+  # aws kms decrypt --ciphertext-blob fileb://<(echo "$ssh_pem" | base64 -d)
+  #echo "$github_token_encrypted" | base64 --decode >/tmp/.github_token_encrypted
+
+  #if [[ ! -f /tmp/.github_token ]]; then
+    #aws kms decrypt \
+      #--output text \
+      #--query Plaintext \
+      #--ciphertext-blob 'fileb:///tmp/.github_token_encrypted' | \
+      #base64 --decode \
+      #>/tmp/.github_token
+  #fi
+
+  echo 'some secret'
+  #export github_token=$(cat /tmp/.github_token)
+}
+
+slack(){
+  local msg="${1}"
+
+  set +e
+  curl -X POST \
+    -H 'Content-type: application/json' \
+    --data '{"text":"'"${msg}"'"}' \
+    https://hooks.slack.com/services/${slack_api_key}
+  set -e
+}

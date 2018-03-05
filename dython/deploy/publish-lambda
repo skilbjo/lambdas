@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+app=$(basename $(dirname $dir))
+
+cd "${dir}/.."
+
+build() {
+  cd src;
+  zip -r9 ../app.zip . && \
+    cd ../ && \
+  chmod 744 app.zip
+}
+
+dev(){
+  if [[ ! -f app.zip ]]; then
+    #add_awscli
+    #add_bin
+    echo 'some stuff'
+  fi
+
+  cd src && \
+    zip -r9 ../app.zip . && \
+    cd ../ && \
+  chmod 744 app.zip
+
+  aws lambda update-function-code  \
+    --profile personal \
+    --region us-east-1 \
+    --function-name "${app}" \
+    --zip-file 'fileb://app.zip'
+}
+
+cleanup() {
+  if [[ -d tmp     ]]; then rm -rf tmp; fi
+  if [[ -f app.zip ]]; then rm app.zip; fi
+}
+
+update() {
+  build
+
+  aws lambda update-function-code  \
+    --profile personal \
+    --region us-east-1 \
+    --function-name "${app}" \
+    --zip-file 'fileb://app.zip'
+
+  cleanup
+}
+
+new(){
+  build
+
+  aws lambda create-function \
+    --profile personal \
+    --region us-east-1 \
+    --function-name "${app}" \
+    --zip-file 'fileb://app.zip' \
+    --role arn:aws:iam::470340682667:role/lambda_with_s3 \
+    --handler 'entrypoint.lambda_handler' \
+    --runtime 'python3.6' \
+    --timeout 60 \
+    --memory-size 128
+
+  cleanup
+}
+
+update
