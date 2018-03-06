@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+aws s3 \
+  --profile personal \
+  cp s3://skilbjo-data/datalake/markets-etl/markets/markets.csv markets.csv
+
+vim markets.csv ~/dev/markets-etl/dev-resources/test/ddl.sql
+
+aws s3 \
+  --profile personal \
+  cp markets.csv s3://skilbjo-data/datalake/markets-etl/markets/markets.csv
+
+rm markets.csv
