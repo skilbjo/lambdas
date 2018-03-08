@@ -3,13 +3,14 @@ set -eou pipefail
 
 _docker(){
   export UDOCKER_DIR=/tmp
-  export UDOCKER_BIN=/tmp/bin
-  export UDOCKER_LIB=/tmp/udocker_dir/lib
+  #export UDOCKER_BIN=/tmp/bin
+  #export UDOCKER_LIB=/tmp/udocker_dir/lib
+  export UDOCKER_TARBALL='/var/task/udocker-1.1.0-RC2.tar.gz'
 
   cd /tmp
 
   # if included at build
-  ln -s /var/task/udocker /tmp/bin/udocker || :
+  #ln -s /var/task/udocker /tmp/bin/udocker || :
 
   # if not included at build
   #curl https://raw.githubusercontent.com/indigo-dc/udocker/devel/udocker.py >udocker
@@ -17,7 +18,7 @@ _docker(){
   # this out-of-date version seems the only version of the script working atm
   #curl https://raw.githubusercontent.com/grycap/scar/master/lambda/udocker >/tmp/bin/udocker
 
-  tar --directory='/tmp' -xf /var/task/udocker-1.1.0-RC2.tar.gz
+  #tar --directory='/tmp' -xf /var/task/udocker-1.1.0-RC2.tar.gz
 
   #chmod +x udocker
 }

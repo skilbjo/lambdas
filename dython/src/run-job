@@ -14,12 +14,19 @@ setup(){
 
 setup
 
-set -x
+uname -a
+set +x
 udocker install
 
-udocker pull busybox # quay.io/skilbjo/iris:x86
-udocker create --name=iris busybox # quay.io/skilbjo/iris:x86
+# Note, Alpine images don't seem to be working
+# try https://github.com/bitnami/minideb as an alternative
+#udocker pull busybox # quay.io/skilbjo/iris:x86
+udocker pull grycap/cowsay # quay.io/skilbjo/iris:x86
+
+#udocker create --name=iris busybox # quay.io/skilbjo/iris:x86
+udocker create --name=iris grycap/cowsay # quay.io/skilbjo/iris:x86
+
 udocker setup --execmode=F1 iris
 
-udocker run -v /dev -v /proc -v /etc/hosts --nosysdirs \
-  iris ls /etc
+udocker run -v /tmp -v /dev -v /proc -v /etc/hosts --nosysdirs \
+  iris cat /etc/os-release
