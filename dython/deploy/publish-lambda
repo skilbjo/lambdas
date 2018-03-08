@@ -13,12 +13,33 @@ build() {
   chmod 744 app.zip
 }
 
+add_bin(){
+  # remember, must be built for AWS AMI (not macOS)
+  zipfile="$(pwd)/app.zip"
+
+  ## udocker
+  (
+    mkdir -p tmp
+    cd tmp
+    cp ../resources/udocker .
+    zip -r9 "$zipfile" udocker
+    cd ../ && rm -r tmp
+  )
+
+  ## udocker.tar.gz
+  (
+    mkdir -p tmp
+    cd tmp
+    cp ../resources/udocker-1.1.0-RC2.tar.gz .
+    zip -r9 "$zipfile" udocker-1.1.0-RC2.tar.gz
+    cd ../ && rm -r tmp
+  )
+}
+
 dev(){
-  if [[ ! -f app.zip ]]; then
-    #add_awscli
-    #add_bin
-    echo 'some stuff'
-  fi
+  #if [[ ! -f app.zip ]]; then
+    add_bin
+  #fi
 
   cd src && \
     zip -r9 ../app.zip . && \
@@ -39,6 +60,7 @@ cleanup() {
 
 update() {
   build
+  add_bin
 
   aws lambda update-function-code  \
     --profile personal \
@@ -66,4 +88,4 @@ new(){
   cleanup
 }
 
-update
+dev

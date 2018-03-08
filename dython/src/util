@@ -3,30 +3,23 @@ set -eou pipefail
 
 _docker(){
   export UDOCKER_DIR=/tmp
+  export UDOCKER_BIN=/tmp/bin
+  export UDOCKER_LIB=/tmp/udocker_dir/lib
 
   cd /tmp
 
   # if included at build
-  #ln -s /var/task/udocker udocker || :
+  ln -s /var/task/udocker /tmp/bin/udocker || :
 
-  # only devel branch works
   # if not included at build
   #curl https://raw.githubusercontent.com/indigo-dc/udocker/devel/udocker.py >udocker
-  curl https://raw.githubusercontent.com/grycap/scar/master/lambda/udocker >/tmp/bin/udocker
-  chmod +x /tmp/bin/udocker
 
-  set -x
-  udocker help
+  # this out-of-date version seems the only version of the script working atm
+  #curl https://raw.githubusercontent.com/grycap/scar/master/lambda/udocker >/tmp/bin/udocker
 
-  # Pull image
-  udocker pull quay.io/skilbjo/iris:x86
+  tar --directory='/tmp' -xf /var/task/udocker-1.1.0-RC2.tar.gz
 
-  # Setup a container
-  udocker create --name=iris quay.io/skilbjo/iris:x86
-  udocker setup --execmode=F1 iris
-
-  # Run it!
-  udocker run --nosysdirs iris cat /etc/os-release
+  #chmod +x udocker
 }
 
 install_dependencies(){
