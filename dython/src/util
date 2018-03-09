@@ -3,24 +3,17 @@ set -eou pipefail
 
 _docker(){
   export UDOCKER_DIR=/tmp
-  #export UDOCKER_BIN=/tmp/bin
-  #export UDOCKER_LIB=/tmp/udocker_dir/lib
   export UDOCKER_TARBALL='/var/task/udocker-1.1.0-RC2.tar.gz'
 
-  cd /tmp
-
-  # if included at build
-  #ln -s /var/task/udocker /tmp/bin/udocker || :
-
-  # if not included at build
-  #curl https://raw.githubusercontent.com/indigo-dc/udocker/devel/udocker.py >udocker
-
-  # this out-of-date version seems the only version of the script working atm
-  #curl https://raw.githubusercontent.com/grycap/scar/master/lambda/udocker >/tmp/bin/udocker
-
-  #tar --directory='/tmp' -xf /var/task/udocker-1.1.0-RC2.tar.gz
-
-  #chmod +x udocker
+  # the udocker binary is included in the app.zip package during the build
+  # no further installation is needed
+  # !! However !!
+  # udocker requires a binary, patchelf to be pre-installed in the docker image
+  # patchelf is not installed by-default in the base alpine image. Add this to
+  # the Dockerfile: # RUN ["qemu-arm-static","/sbin/apk","-U","add","patchelf"]
+  # !! Additionally !!
+  # you might not get very far with udocker + Alpine Linux; so try
+  # bitnami/minideb as an alternative base image
 }
 
 install_dependencies(){
@@ -36,8 +29,6 @@ install_dependencies(){
 }
 
 _decrypt_secrets(){
-  # Unable to load paramfile fileb:///dev/fd/63: [Errno 2] No such file or directory: '/dev/fd/63'
-  # aws kms decrypt --ciphertext-blob fileb://<(echo "$ssh_pem" | base64 -d)
   #echo "$github_token_encrypted" | base64 --decode >/tmp/.github_token_encrypted
 
   #if [[ ! -f /tmp/.github_token ]]; then
@@ -51,15 +42,4 @@ _decrypt_secrets(){
 
   echo 'some secret'
   #export github_token=$(cat /tmp/.github_token)
-}
-
-slack(){
-  local msg="${1}"
-
-  set +e
-  curl -X POST \
-    -H 'Content-type: application/json' \
-    --data '{"text":"'"${msg}"'"}' \
-    https://hooks.slack.com/services/${slack_api_key}
-  set -e
 }

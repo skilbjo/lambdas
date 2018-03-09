@@ -12,21 +12,18 @@ setup(){
   #_decrypt_secrets
 }
 
-setup
+run_docker() {
+  local image="$1"
+  local cmd="$2"
 
-uname -a
-set +x
-udocker install
+  udocker install
 
-# Note, Alpine images don't seem to be working
-# try https://github.com/bitnami/minideb as an alternative
-#udocker pull busybox # quay.io/skilbjo/iris:x86
-udocker pull grycap/cowsay # quay.io/skilbjo/iris:x86
+  udocker pull "$image"
+  udocker create --name=_ "$image"
+  udocker setup --execmode=F1 _
 
-#udocker create --name=iris busybox # quay.io/skilbjo/iris:x86
-udocker create --name=iris grycap/cowsay # quay.io/skilbjo/iris:x86
+  udocker run --nosysdirs _ $cmd
+}
 
-udocker setup --execmode=F1 iris
-
-udocker run -v /tmp -v /dev -v /proc -v /etc/hosts --nosysdirs \
-  iris cat /etc/os-release
+setup && \
+  run_docker quay.io/skilbjo/iris:x86 /usr/local/deploy/bin/run-job
