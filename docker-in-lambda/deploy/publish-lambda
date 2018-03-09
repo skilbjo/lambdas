@@ -14,7 +14,6 @@ build() {
 }
 
 add_bin(){
-  # remember, must be built for AWS AMI (not macOS)
   zipfile="$(pwd)/app.zip"
 
   ## udocker
@@ -37,9 +36,9 @@ add_bin(){
 }
 
 dev(){
-  #if [[ ! -f app.zip ]]; then
+  if [[ ! -f app.zip ]]; then
     add_bin
-  #fi
+  fi
 
   cd src && \
     zip -r9 ../app.zip . && \
