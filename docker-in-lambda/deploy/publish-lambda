@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+app=$(basename $(dirname $dir))
+
+cd "${dir}/.."
+
+build() {
+  cd src;
+  zip -r9 ../app.zip . && \
+    cd ../ && \
+  chmod 744 app.zip
+}
+
+add_bin(){
+  zipfile="$(pwd)/app.zip"
+
+  ## udocker
+  (
+    mkdir -p tmp
+    cd tmp
+    cp ../resources/udocker .
+    zip -r9 "$zipfile" udocker
+    cd ../ && rm -r tmp
+  )
+
+  ## udocker.tar.gz
+  (
+    mkdir -p tmp
+    cd tmp
+    cp ../resources/udocker-1.1.0-RC2.tar.gz .
+    zip -r9 "$zipfile" udocker-1.1.0-RC2.tar.gz
+    cd ../ && rm -r tmp
+  )
+}
+
+dev(){
+  if [[ ! -f app.zip ]]; then
+    add_bin
+  fi
+
+  cd src && \
+    zip -r9 ../app.zip . && \
+    cd ../ && \
+  chmod 744 app.zip
+
+  aws lambda update-function-code  \
+    --profile personal \
+    --region us-east-1 \
+    --function-name "${app}" \
+    --zip-file 'fileb://app.zip'
+}
+
+cleanup() {
+  if [[ -d tmp     ]]; then rm -rf tmp; fi
+  if [[ -f app.zip ]]; then rm app.zip; fi
+}
+
+update() {
+  build
+  add_bin
+
+  aws lambda update-function-code  \
+    --profile personal \
+    --region us-east-1 \
+    --function-name "${app}" \
+    --zip-file 'fileb://app.zip'
+
+  cleanup
+}
+
+new(){
+  build
+
+  aws lambda create-function \
+    --profile personal \
+    --region us-east-1 \
+    --function-name "${app}" \
+    --zip-file 'fileb://app.zip' \
+    --role arn:aws:iam::470340682667:role/lambda_with_s3 \
+    --handler 'entrypoint.lambda_handler' \
+    --runtime 'python3.6' \
+    --timeout 60 \
+    --memory-size 128
+
+  cleanup
+}
+
+dev

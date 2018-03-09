@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+_docker(){
+  export UDOCKER_DIR=/tmp
+  export UDOCKER_TARBALL='/var/task/udocker-1.1.0-RC2.tar.gz'
+
+  # the udocker binary is included in the app.zip package during the build
+  # no further installation is needed
+  # !! However !!
+  # udocker requires a binary, patchelf to be pre-installed in the docker image
+  # patchelf is not installed by-default in the base alpine image. Add this to
+  # the Dockerfile: # RUN ["qemu-arm-static","/sbin/apk","-U","add","patchelf"]
+  # !! Additionally !!
+  # you might not get very far with udocker + Alpine Linux; so try
+  # bitnami/minideb as an alternative base image
+}
+
+install_dependencies(){
+  bin_dir='/tmp/bin'
+
+  export PATH="${PATH}:${bin_dir}"
+
+  mkdir -p /tmp/bin
+
+  _docker
+
+  chmod u+x /tmp/bin/* || :
+}
+
+_decrypt_secrets(){
+  #echo "$github_token_encrypted" | base64 --decode >/tmp/.github_token_encrypted
+
+  #if [[ ! -f /tmp/.github_token ]]; then
+    #aws kms decrypt \
+      #--output text \
+      #--query Plaintext \
+      #--ciphertext-blob 'fileb:///tmp/.github_token_encrypted' | \
+      #base64 --decode \
+      #>/tmp/.github_token
+  #fi
+
+  echo 'some secret'
+  #export github_token=$(cat /tmp/.github_token)
+}
