@@ -40,6 +40,6 @@ _decrypt_secrets(){
       #>/tmp/.github_token
   #fi
 
-  echo 'some secret'
   #export github_token=$(cat /tmp/.github_token)
+  echo ''
 }

@@ -26,4 +26,4 @@ run_docker() {
 }
 
 setup && \
-  run_docker quay.io/skilbjo/iris:x86 /usr/local/deploy/bin/run-job
+  run_docker quay.io/skilbjo/iris:x86-debian '/bin/sh -c "/usr/local/deploy/bin/run-job"'
