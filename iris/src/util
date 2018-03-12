@@ -43,4 +43,30 @@ _decrypt_secrets(){
   fi
 
   export email_pw=$(cat /tmp/.email_pw)
+
+  echo "$aws_access_key_id_encrypted" | base64 --decode >"/tmp/.aws_access_key_id_encrypted"
+
+  if [[ ! -f /tmp/.aws_access_key_id ]]; then
+    aws kms decrypt \
+      --output text \
+      --query Plaintext \
+      --ciphertext-blob "fileb:///tmp/.aws_access_key_id_encrypted" | \
+      base64 --decode \
+      >"/tmp/.aws_access_key_id"
+  fi
+
+  export aws_access_key_id=$(cat /tmp/.aws_access_key_id)
+
+  echo "$aws_secret_access_key_encrypted" | base64 --decode >"/tmp/.aws_secret_access_key_encrypted"
+
+  if [[ ! -f /tmp/.aws_secret_access_key ]]; then
+    aws kms decrypt \
+      --output text \
+      --query Plaintext \
+      --ciphertext-blob "fileb:///tmp/.aws_secret_access_key_encrypted" | \
+      base64 --decode \
+      >"/tmp/.aws_secret_access_key"
+  fi
+
+  export aws_secret_access_key=$(cat /tmp/.aws_secret_access_key)
 }
