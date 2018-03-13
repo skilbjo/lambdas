@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+my_secret_encrypted="$(echo "postgres://user:pass@host:port/db" | base64 --input -)"
+
+echo "encrypted var: $my_secret_encrypted"
+
+_decrypt(){
+  local _name="$(echo $1 | sed 's/_encrypted//')"
+  local _encrypted=$(eval echo "\$${1}")
+  echo "name is:      $_name"
+  echo "encrypted is: $_encrypted"
+  echo "${_encrypted}" | base64 --decode >"${_name}_encrypted"
+
+  if [[ ! -f ${_name} ]]; then
+    echo "$_encrypted" | \
+      base64 --decode \
+      >"${_name}"
+  fi
+
+  export "${_name}"="$(cat ${_name})"
+  echo "${_name} is: " $(eval echo "\$${_name}")
+  rm "${_name}_encrypted"
+  rm ${_name}
+  exit 0
+}
+
+_decrypt_secrets(){
+  _decrypt my_secret_encrypted
+}
+
+_decrypt_secrets

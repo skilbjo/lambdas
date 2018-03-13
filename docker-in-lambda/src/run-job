@@ -20,6 +20,9 @@ run_docker() {
 
   udocker pull "$image"
   udocker create --name=_ "$image"
+
+  udocker rmi -f "$image"
+
   udocker setup --execmode=F1 _
 
   udocker run --nosysdirs _ $cmd
