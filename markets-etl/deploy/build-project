@@ -174,7 +174,7 @@ src_files_clj(){
   # get ready to replace the -main and execute! for all jobs
   sed -i '' -e '56,$ d' "${app}/src/jobs/currency.clj"
   sed -i '' -e '52,$ d' "${app}/src/jobs/economics.clj"
-  sed -i '' -e '140,$ d' "${app}/src/jobs/equities.clj"
+  sed -i '' -e '142,$ d' "${app}/src/jobs/equities.clj"
   sed -i '' -e '70,$ d' "${app}/src/jobs/interest_rates.clj"
   sed -i '' -e '70,$ d' "${app}/src/jobs/real_estate.clj"
   new_entrypoint='
@@ -197,7 +197,7 @@ src_files_clj(){
 
   for _job in "${_jobs[@]}"; do
     # no upsert in "big data". change it to util/now and pray
-    sed -i '' "s/:start_date.*/:start_date util\/yesterday/g" "${app}/src/jobs/${_job}.clj"
+    sed -i '' "s/:start_date.*/:start_date util\/now/g" "${app}/src/jobs/${_job}.clj"
     sed -i '' "s/:end_date.*/:end_date util\/now})/g" "${app}/src/jobs/${_job}.clj"
 
     # new entrypoint
@@ -208,7 +208,7 @@ src_files_clj(){
   done
 
   for _job in "equities"; do
-    sed -i '' '150s/datasets/(concat morningstar datasets)/' "${app}/src/jobs/equities.clj"
+    sed -i '' '152s/datasets/(concat morningstar datasets)/' "${app}/src/jobs/equities.clj"
   done
 
   # wrap decrypt

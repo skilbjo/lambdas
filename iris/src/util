@@ -30,43 +30,25 @@ install_dependencies(){
   chmod u+x /tmp/bin/* || :
 }
 
+_decrypt(){
+  local _name="$(echo $1 | sed 's/_encrypted//')"
+  local _encrypted=$(eval echo "\$${1}")
+  echo "${_encrypted}" | base64 --decode >"/tmp/.${_name}_encrypted"
+
+  if [[ ! -f /tmp/.${_name} ]]; then
+    aws kms decrypt \
+      --output text \
+      --query Plaintext \
+      --ciphertext-blob "fileb:///tmp/.${_name}_encrypted" | \
+      base64 --decode \
+      >"/tmp/.${_name}"
+  fi
+
+  export "${_name}"="$(cat /tmp/.${_name})"
+}
+
 _decrypt_secrets(){
-  echo "$email_pw_encrypted" | base64 --decode >"/tmp/.email_pw_encrypted"
-
-  if [[ ! -f /tmp/.email_pw ]]; then
-    aws kms decrypt \
-      --output text \
-      --query Plaintext \
-      --ciphertext-blob "fileb:///tmp/.email_pw_encrypted" | \
-      base64 --decode \
-      >"/tmp/.email_pw"
-  fi
-
-  export email_pw=$(cat /tmp/.email_pw)
-
-  echo "$aws_access_key_id_encrypted" | base64 --decode >"/tmp/.aws_access_key_id_encrypted"
-
-  if [[ ! -f /tmp/.aws_access_key_id ]]; then
-    aws kms decrypt \
-      --output text \
-      --query Plaintext \
-      --ciphertext-blob "fileb:///tmp/.aws_access_key_id_encrypted" | \
-      base64 --decode \
-      >"/tmp/.aws_access_key_id"
-  fi
-
-  export aws_access_key_id=$(cat /tmp/.aws_access_key_id)
-
-  echo "$aws_secret_access_key_encrypted" | base64 --decode >"/tmp/.aws_secret_access_key_encrypted"
-
-  if [[ ! -f /tmp/.aws_secret_access_key ]]; then
-    aws kms decrypt \
-      --output text \
-      --query Plaintext \
-      --ciphertext-blob "fileb:///tmp/.aws_secret_access_key_encrypted" | \
-      base64 --decode \
-      >"/tmp/.aws_secret_access_key"
-  fi
-
-  export aws_secret_access_key=$(cat /tmp/.aws_secret_access_key)
+  _decrypt email_pw_encrypted
+  _decrypt aws_access_key_id_encrypted
+  _decrypt aws_secret_access_key_encrypted
 }
