@@ -118,7 +118,6 @@ sql_clj(){
 
 (defn insert-to-athena [job coll]
   (let [dataset        (-> coll first :dataset)
-        _ (println "in insert-to-athena. dataset: " dataset)
         convert-to-csv (fn [row]
                          (io/delete-file (str "/tmp/"
                                               job
@@ -134,9 +133,7 @@ sql_clj(){
                                                           job
                                                           "/s3uploaddate="
                                                           util/now
-                                                          "/"
-                                                          dataset
-                                                          ".csv")
+                                                          "/file.csv")
                                         :metadata    {:server-side-encryption "AES256"}
                                         :file        (str "/tmp/"
                                                           job
