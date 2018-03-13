@@ -117,7 +117,9 @@ sql_clj(){
    (sequence (vectorize* opts) rows)))
 
 (defn insert-to-athena [job coll]
-  (let [convert-to-csv (fn [row]
+  (let [dataset        (-> coll first :dataset)
+        _ (println "in insert-to-athena. dataset: " dataset)
+        convert-to-csv (fn [row]
                          (io/delete-file (str "/tmp/"
                                               job
                                               ".csv")
@@ -132,7 +134,9 @@ sql_clj(){
                                                           job
                                                           "/s3uploaddate="
                                                           util/now
-                                                          "/file.csv")
+                                                          "/"
+                                                          dataset
+                                                          ".csv")
                                         :metadata    {:server-side-encryption "AES256"}
                                         :file        (str "/tmp/"
                                                           job
@@ -176,7 +180,6 @@ src_files_clj(){
   sed -i '' -e '140,$ d' "${app}/src/jobs/equities.clj"
   sed -i '' -e '70,$ d' "${app}/src/jobs/interest_rates.clj"
   sed -i '' -e '70,$ d' "${app}/src/jobs/real_estate.clj"
-
   new_entrypoint='
 (defn execute! [data]
   (->> data
@@ -196,15 +199,19 @@ src_files_clj(){
   declare -a _jobs=("currency" "equities" "economics" "interest_rates" "real_estate")
 
   for _job in "${_jobs[@]}"; do
-    # change to 3 days ago for everything since we don't want to clobber athena queries
-    sed -i '' "s/:start_date.*/:start_date util\/three-days-ago/g" "${app}/src/jobs/${_job}.clj"
-    sed -i '' "s/:end_date.*/:end_date util\/three-days-ago})/g" "${app}/src/jobs/${_job}.clj"
+    # no upsert in "big data". change it to util/now and pray
+    sed -i '' "s/:start_date.*/:start_date util\/yesterday/g" "${app}/src/jobs/${_job}.clj"
+    sed -i '' "s/:end_date.*/:end_date util\/now})/g" "${app}/src/jobs/${_job}.clj"
 
     # new entrypoint
     echo -e "$new_entrypoint" >>"${app}/src/jobs/${_job}.clj"
 
     # inject name of the file for the csv file name
     sed -i '' "s/\*ns\*/\"jobs\.${_job}\"/g" "${app}/src/jobs/${_job}.clj"
+  done
+
+  for _job in "equities"; do
+    sed -i '' '150s/datasets/(concat morningstar datasets)/' "${app}/src/jobs/equities.clj"
   done
 
   # wrap decrypt
