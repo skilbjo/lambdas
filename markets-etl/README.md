@@ -14,7 +14,7 @@ run deploy/build-project
 
 #### event
 
-- cloudwatch rules/schedule, run once a day
+- cloudwatch rules/schedule, cron expression -> `35 22 ? * MON-FRI *`
 
 payload:
 

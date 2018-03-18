@@ -13,18 +13,14 @@ setup(){
 }
 
 run_docker() {
-  local image="quay.io/skilbjo/iris:x86-debian"
+  local image="quay.io/skilbjo/iris:minicon"
   local cmd="/usr/local/deploy/bin/run-job"
 
   udocker pull "$image"
   udocker create --name=_ "$image"
   udocker setup --execmode=F1 _
-
-  set -x
-
-  set +e
-  if [[ -d /sent ]]; then ls -la /sent; fi
-  set -e
+  udocker rmi -f "$image" # after creating the container, we can delete the
+                          # image. after all, AWS Lambda = 512mb disk, only
 
   udocker run --nosysdirs \
     -v /dev -v /proc -v /etc/hosts \
