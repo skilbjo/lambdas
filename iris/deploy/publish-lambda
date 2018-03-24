@@ -38,7 +38,7 @@ add_bin(){
   (
     virtualenv="virtual-env"
     mkdir -p tmp
-    cd tmp; virtualenv virtual-env
+    cd tmp; virtualenv --python=$(which python2) virtual-env
     set +u
     source virtual-env/bin/activate
     set -u
