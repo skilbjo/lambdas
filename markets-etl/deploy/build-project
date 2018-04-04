@@ -20,7 +20,8 @@ copy_files(){
   cleanup
 
   cp "${src_dir}/project.clj"  "${app}/project.clj"
-  cp -r "${src_dir}/src"       "${app}/src"
+  cp -r "${src_dir}/src"       "${app}/src" \
+    && if [[ -d ${app}/src/benchmark ]]; then rm -rf ${app}/src/benchmark; fi # benchmark has references to test/fixtures ns, which is not copied in
 }
 
 add_aws_lambda_clj(){
@@ -174,7 +175,7 @@ src_files_clj(){
   # get ready to replace the -main and execute! for all jobs
   sed -i '' -e '56,$ d' "${app}/src/jobs/currency.clj"
   sed -i '' -e '52,$ d' "${app}/src/jobs/economics.clj"
-  sed -i '' -e '142,$ d' "${app}/src/jobs/equities.clj"
+  sed -i '' -e '161,$ d' "${app}/src/jobs/equities.clj"
   sed -i '' -e '70,$ d' "${app}/src/jobs/interest_rates.clj"
   sed -i '' -e '70,$ d' "${app}/src/jobs/real_estate.clj"
   new_entrypoint='
@@ -208,7 +209,7 @@ src_files_clj(){
   done
 
   for _job in "equities"; do
-    sed -i '' '152s/datasets/(concat morningstar datasets)/' "${app}/src/jobs/equities.clj"
+    sed -i '' '171s/datasets/(concat morningstar datasets)/' "${app}/src/jobs/equities.clj"
   done
 
   # wrap decrypt
