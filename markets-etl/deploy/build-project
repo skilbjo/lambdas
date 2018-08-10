@@ -175,7 +175,7 @@ src_files_clj(){
   # get ready to replace the -main and execute! for all jobs
   sed -i '' -e '56,$ d' "${app}/src/jobs/currency.clj"
   sed -i '' -e '52,$ d' "${app}/src/jobs/economics.clj"
-  sed -i '' -e '161,$ d' "${app}/src/jobs/equities.clj"
+  sed -i '' -e '234,$ d' "${app}/src/jobs/equities.clj"
   sed -i '' -e '70,$ d' "${app}/src/jobs/interest_rates.clj"
   sed -i '' -e '70,$ d' "${app}/src/jobs/real_estate.clj"
   new_entrypoint='
@@ -208,8 +208,18 @@ src_files_clj(){
     sed -i '' "s/\*ns\*/\"jobs\.${_job}\"/g" "${app}/src/jobs/${_job}.clj"
   done
 
+  ## note #_intrinio below
   for _job in "equities"; do
-    sed -i '' '171s/datasets/(concat morningstar datasets)/' "${app}/src/jobs/equities.clj"
+    sed -i '' '244s/datasets/(concat tiingo morningstar quandl #_intrinio)/' \
+      "${app}/src/jobs/equities.clj"
+
+    sed -i '' -e '248,$ d' "${app}/src/jobs/equities.clj"
+    main_fn_tail='
+      (execute! data))
+
+  (util/notify-healthchecks-io (-> :healthchecks-io-api-key env)))'
+
+    echo -e "$main_fn_tail" >>"${app}/src/jobs/${_job}.clj"
   done
 
   # wrap decrypt
