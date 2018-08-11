@@ -1,6 +1,6 @@
 ## iris 📊
 
-### what 
+### what
 Using the docker-in-lambda work (the ultimate in functions-as-a-service, serverless computing, and virtualization and containerization), get a container running and sending an email on how my portfolio is doing for the day. Dependency on markets-etl and treats AWS Athena as its database.
 
 Lots of interesting work done here, not just on the infrastructure side, but also writing a bash wrapper to treat the aws cli like a psql client: <https://github.com/skilbjo/iris/blob/master/src/athena>
@@ -25,7 +25,15 @@ export email_pw_encrypted=''
 ```
 
 ### triggers
-- Cloudwatch rule -> schedule -> cron expression: `35 22 ? * MON-FRI *`
+Cloudwatch rules are in UTC (~ -7/-8hrs to PST)
+
+#### Morningstar API is ready
+3:22pm, M-F
+- Cloudwatch rule -> schedule -> cron expression: `22 22 ? * MON-FRI *`
+
+#### Tiingo API is ready
+4:25pm, M-F
+- Cloudwatch rule -> schedule -> cron expression: `22 23 ? * MON-FRI *`
 
 ### execution role
 - lambda\_with\_s3

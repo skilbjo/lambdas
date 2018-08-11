@@ -11,11 +11,17 @@ markets-etl, but in lambda form
 run deploy/build-project
 
 ### triggers
+Cloudwatch rules are in UTC (~ -7/-8hrs to PST)
+
+#### Morningstar API is ready
+3:20pm, M-F
+- Cloudwatch rules/schedule, cron expression -> `20 22 ? * MON-FRI *`
+
+#### Tiingo API is ready
+4:20pm, M-F
+- Cloudwatch rule -> schedule -> cron expression: `20 23 ? * MON-FRI *`
 
 #### event
-
-- cloudwatch rules/schedule, cron expression -> `35 22 ? * MON-FRI *`
-
 payload:
 
 ```json
