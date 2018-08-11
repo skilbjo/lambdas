@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+sns_event="$1"
+
+setup(){
+  src_dir='/var/task'
+
+  export PATH="${PATH}:${src_dir}"
+
+  source "${src_dir}/util"
+  source "${src_dir}/athena"
+
+  install_dependencies
+  _decrypt_secrets
+}
+
+get_file(){
+  s3_event="$1"
+
+  file_jq='.Records[].s3.object.key'
+
+  file_json="$(echo "$s3_event" | jq -r "$file_jq")"
+
+  file=$(basename $file_json .csv)
+
+  echo "$file"
+}
+
+lookup_schema(){
+  file="$1"
+
+  set +e
+  schema="$(cat file_to_athena_table_map.csv | grep -w "$file" | awk -F, '{print $2}')"
+  set -e
+
+  echo "$schema"
+}
+
+lookup_table(){
+  file="$1"
+
+  set +e
+  table="$(cat file_to_athena_table_map.csv | grep -w "$file" | awk -F, '{print $3}')"
+  set -e
+
+  echo "$table"
+}
+
+get_s3_event(){
+  sns_event="$1"
+
+  s3_jq='.Records[].Sns.Message'
+
+  s3_json="$(echo "$sns_event" | jq -r "$s3_jq")"
+
+  echo "$s3_json"
+}
+
+refresh_partitions(){
+  sns_event="$1"
+
+  s3_event="$(get_s3_event "$sns_event")"
+  file="$(get_file "$s3_event")"
+  schema="$(lookup_schema "$file")"
+  table="$(lookup_table "$file")"
+
+  if [[ ! -z $schema ]] && [[ ! -z $table ]]; then
+    query "msck repair table ${schema}.${table};"
+    echo "msck repair table ran for ${schema}.${table}"
+  else
+    echo "File not found in the file->table mapping for ${file}. Is Athena DDL created?"
+  fi
+}
+
+setup && \
+  refresh_partitions "$sns_event"
