@@ -23,7 +23,7 @@ get_query () {
 
   local cmd="aws s3 cp $results /tmp/athena/query >/dev/null"
 
-  eval $cmd && \
+  eval "$cmd" && \
     cat /tmp/athena/query
 }
 
@@ -59,6 +59,6 @@ query() {
       --query-string "$sql_trimmed"
     )
 
-    wait_til_finished $athena_query
+    wait_til_finished "$athena_query"
   fi
 }
