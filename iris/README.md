@@ -33,7 +33,7 @@ Cloudwatch rules are in UTC (~ -7/-8hrs to PST)
 
 #### Tiingo API is ready
 4:25pm, M-F
-- Cloudwatch rule -> schedule -> cron expression: `22 23 ? * MON-FRI *`
+- Cloudwatch rule -> schedule -> cron expression: `42 0 ? * MON-FRI *`
 
 ### execution role
 - lambda\_with\_s3
