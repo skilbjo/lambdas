@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+_jq(){
+  # jq added at build time
+  ln -s /var/task/jq /tmp/bin/jq || :
+
+  # or at runtime
+  #curl -L \
+    #https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 \
+    #-o /tmp/bin/jq
+}
+
+install_dependencies(){
+  bin_dir='/tmp/bin'
+
+  export PATH="${PATH}:${bin_dir}"
+
+  mkdir -p /tmp/bin
+
+  _jq
+
+  chmod u+x /tmp/bin/* || :
+}
+
+slack(){
+  local msg="${1}"
+
+  set +e
+  curl -X POST \
+    -H 'Content-type: application/json' \
+    --data '{"text":"'"${msg}"'"}' \
+    https://hooks.slack.com/services/${slack_api_key}
+  set -e
+}
+
+_decrypt(){
+  local _name="$(echo $1 | sed 's/_encrypted//')"
+  local _encrypted=$(eval echo "\$${1}")
+  echo "${_encrypted}" | base64 --decode >"/tmp/.${_name}_encrypted"
+
+  if [[ ! -f /tmp/.${_name} ]]; then
+    aws kms decrypt \
+      --output text \
+      --query Plaintext \
+      --ciphertext-blob "fileb:///tmp/.${_name}_encrypted" | \
+      base64 --decode \
+      >"/tmp/.${_name}"
+  fi
+
+  export "${_name}"="$(cat /tmp/.${_name})"
+}
+
+_decrypt_secrets(){
+  _decrypt aws_access_key_id_encrypted
+  _decrypt aws_secret_access_key_encrypted
+}

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+sns_event="$1"
+
+setup(){
+  src_dir='/var/task'
+
+  export PATH="${PATH}:${src_dir}"
+
+  source "${src_dir}/util"
+  source "${src_dir}/athena"
+
+  install_dependencies
+  _decrypt_secrets
+}
+
+setup

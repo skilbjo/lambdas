@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+tmp_dir="$(mkdir -p /tmp/s3-logs && echo '/tmp/s3-logs')"
+
+get_all_files(){
+  aws --profile personal s3 ls s3://skilbjo-logs/ >"${tmp_dir}/ls"
+}
