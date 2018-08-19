@@ -18,8 +18,8 @@ Cloudwatch rules are in UTC (~ -7/-8hrs to PST)
 - Cloudwatch rules/schedule, cron expression -> `20 22 ? * MON-FRI *`
 
 #### Tiingo API is ready
-4:20pm, M-F
-- Cloudwatch rule -> schedule -> cron expression: `40 0 ? * MON-FRI *`
+6:40pm, M-F
+- Cloudwatch rule -> schedule -> cron expression: `40 1 ? * TUE-SAT *`
 
 #### event
 payload:
