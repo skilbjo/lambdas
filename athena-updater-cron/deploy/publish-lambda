@@ -8,8 +8,9 @@ cd "${dir}/.."
 
 add_bin(){
   # remember, must be built for AWS AMI (not macOS)
-  ## jq
   zipfile="$(pwd)/app.zip"
+
+  # jq
   (
     mkdir -p tmp
     cd tmp

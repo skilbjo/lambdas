@@ -69,6 +69,7 @@ refresh_partitions(){
     query "msck repair table ${schema}.${table};"
     echo "msck repair table ran for ${schema}.${table}"
   else
+    echo "$s3_event"
     echo "File not found in the file->table mapping for ${file}. Is Athena DDL created?"
   fi
 }

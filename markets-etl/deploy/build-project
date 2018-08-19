@@ -134,7 +134,9 @@ sql_clj(){
                                                           job
                                                           "/s3uploaddate="
                                                           util/now
-                                                          "/file.csv")
+                                                          "/"
+                                                          job
+                                                          ".csv")
                                         :metadata    {:server-side-encryption "AES256"}
                                         :file        (str "/tmp/"
                                                           job
