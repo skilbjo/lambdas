@@ -1,0 +1,6 @@
+file,schema,table
+equities,dw,equities_fact
+economics,dw,economics_fact
+currency,dw,currency_fact
+interest_rates,dw,interest_rates_fact
+real_estate,dw,real_estate_fact

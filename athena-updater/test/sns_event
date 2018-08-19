@@ -21,7 +21,7 @@
                                              "bucket":{"name":"skilbjo-data",
                                                        "ownerIdentity":{"principalId":"A128U96DN62YT0"},
                                                        "arn":"arn:aws:s3:::skilbjo-data"},
-                                             "object":{"key":"datalake/markets-etl/currency/s3uploaddate=2018-01-08/file.csv",
+                                             "object":{"key":"datalake/markets-etl/currency/s3uploaddate=2018-08-20/currency.csv",
                                                        "size":879974,
                                                        "eTag":"317721a717fb08f94f2567f216f652c3",
                                                        "sequencer":"005A27255F9488BEBA"}}}]},
