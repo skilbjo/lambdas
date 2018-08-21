@@ -18,6 +18,7 @@ cleanup() {
   if [[ -f project.clj ]]; then rm    project.clj; fi
   if [[ -d target      ]]; then rm -r target; fi
   if [[ -d src         ]]; then rm -r src; fi
+  if [[ -d resources   ]]; then rm -r resources; fi
 }
 
 update() {
