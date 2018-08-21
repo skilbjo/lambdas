@@ -132,6 +132,7 @@ sql_clj(){
                          (s3/put-object :bucket-name "skilbjo-data"
                                         :key         (str "datalake/markets-etl/"
                                                           job
+                                                          "_fact"
                                                           "/s3uploaddate="
                                                           util/now
                                                           "/"
