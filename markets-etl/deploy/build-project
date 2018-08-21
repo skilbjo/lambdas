@@ -13,11 +13,15 @@ cd "${dir}/../../"                   # now in ~/dev/lambdas/
 
 cleanup(){
   if [[ -f ${app}/project.clj ]]; then rm -f ${app}/project.clj; fi
+  if [[ -d ${app}/resources   ]]; then rm -r ${app}/resources; fi
   if [[ -d ${app}/src         ]]; then rm -r ${app}/src; fi
 }
 
 copy_files(){
   cleanup
+
+  mkdir -p "${app}/resources" && \
+    cp "${app}/include/log4j.properties" "${app}/resources/log4j.properties"
 
   cp "${src_dir}/project.clj"  "${app}/project.clj"
   cp -r "${src_dir}/src"       "${app}/src" \
@@ -247,3 +251,4 @@ add_lambda_wrappers(){
 copy_files
 add_aws_lambda_clj
 add_lambda_wrappers
+cleanup
