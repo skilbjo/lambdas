@@ -5,7 +5,7 @@ def main():
   import subprocess
 
   # os.system('/var/task/run-job')
-  subprocess.call(['/var/task/run-job'])
+  subprocess.call(['/var/task/run-it'])
 
   return print('done!')
 
