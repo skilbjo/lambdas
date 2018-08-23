@@ -19,5 +19,5 @@ cd ping-it && deploy/bin/run-job
 git push "https://skilbjo:${github_token}@github.com/skilbjo/ping-it.git"
 cd -
 
-curl -fsS --retry 3 "https://hchk.io/${hchk_ping_it}"
+ping_healthchecks "$hchk_ping_it"
 slack "ping-it: i ran"
