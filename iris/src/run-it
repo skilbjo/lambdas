@@ -32,4 +32,5 @@ run_docker() {
 }
 
 setup && \
-  run_docker
+  run_docker && \
+  ping_healthchecks "$healthchecks_io_iris"

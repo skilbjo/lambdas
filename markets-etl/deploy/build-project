@@ -51,6 +51,11 @@ util_clj(){
   echo "$header" | cat - "${app}/src/markets_etl/util.clj" >temp && \
     mv temp "${app}/src/markets_etl/util.clj"
 
+  ## Tiingo only updated at 6pm PST (next day UTC). As such adjust the date
+  sed -i '' \
+    's/(def now (-> (time\/now)/(def now (-> (time\/yesterday)/' \
+    "${app}/src/markets_etl/util.clj"
+
   local decrypt='
 ; -- aws -----------------------------------------------
 (defn decrypt [ciphertext]
@@ -75,6 +80,7 @@ sql_clj(){
             [clojure.data.csv :as csv]
             [clojure.java.jdbc :as jdbc]
             [clojure.java.io :as io]
+            [clojure.tools.logging :as log]
             [environ.core :refer [env]]
             [markets-etl.util :as util])
   (:import [java.sql DriverManager]))'
@@ -133,19 +139,21 @@ sql_clj(){
                                                             ".csv"))]
                            (csv/write-csv writer row)))
         s3-put         (fn [job]
-                         (s3/put-object :bucket-name "skilbjo-data"
-                                        :key         (str "datalake/markets-etl/"
-                                                          job
-                                                          "_fact"
-                                                          "/s3uploaddate="
-                                                          util/now
-                                                          "/"
-                                                          job
-                                                          ".csv")
-                                        :metadata    {:server-side-encryption "AES256"}
-                                        :file        (str "/tmp/"
-                                                          job
-                                                          ".csv")))]
+                         (let [s3-path (str "datalake/markets-etl/"
+                                            job
+                                            "_fact"
+                                            "/s3uploaddate="
+                                            util/now
+                                            "/"
+                                            job
+                                            ".csv")]
+                           (log/info "s3-path is:" s3-path)
+                           (s3/put-object :bucket-name "skilbjo-data"
+                                          :key         s3-path
+                                          :metadata    {:server-side-encryption "AES256"}
+                                          :file        (str "/tmp/"
+                                                            job
+                                                            ".csv"))))]
     (->> coll
          vectorize
          convert-to-csv)
