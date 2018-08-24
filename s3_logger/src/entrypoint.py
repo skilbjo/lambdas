@@ -9,7 +9,7 @@ def main(event):
 
   event_str = to_json(event)
 
-  subprocess.call(['/var/task/run-job',event_str])
+  subprocess.call(['/var/task/run-it',event_str])
 
   return print('done!')
 

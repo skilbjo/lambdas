@@ -15,4 +15,5 @@ setup(){
   _decrypt_secrets
 }
 
-setup
+setup && \
+  ping_healthchecks "$healthchecks_io_s3_logger"
