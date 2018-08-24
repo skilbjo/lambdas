@@ -11,7 +11,7 @@ test_code() {
     --profile personal \
     --invocation-type Event \
     --region us-east-1 \
-    --payload 'file://test/cloudwatch_events_rules' \
+    --payload 'file://test/sns_event' \
     --function-name "${app}" \
   test/response
 }
