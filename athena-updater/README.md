@@ -11,8 +11,7 @@ table [schema].[table]` command, and update the partitions.
 
 ### build
 ```bash
-mkvirtualenv --python=$(which python3) pylambda || workon pylambda
-(pylambda) deploy/build-project && test/run-tests
+deploy/build-project && test/run-tests
 ```
 
 ### config
@@ -30,6 +29,7 @@ economics,dw,economics
 ```bash
 export aws_access_key_id='[robot]'
 export aws_secret_access_key='[robot]'
+export healthchecks_io_athena_updater=''
 ```
 
 #### triggers
@@ -40,6 +40,9 @@ entrypoint.lambda_handler
 ```
 
 #### execution role
+```bash
+lambda_with_athena_and_s3
+```
 
 #### runtime
 - 128mb

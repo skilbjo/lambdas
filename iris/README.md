@@ -9,36 +9,37 @@ See <https://github.com/skilbjo/iris> for more
 
 <img src="dev-resources/img/iris.png" alt="hi" width="900"/>
 
-## build
+### build
 ```bash
 mkvirtualenv pylambda || workon pylambda
 (pylambda) deploy/build-project && test/run-tests
 ```
 
-## config
-### env vars
+### config
+#### env vars
 ```bash
-export aws_access_key_id=''
-export aws_secret_access_key=''
+export aws_access_key_id_encrypted=''
+export aws_secret_access_key_encrypted=''
 export email=''
 export email_pw_encrypted=''
+export healthchecks_io_iris=''
 ```
 
-### triggers
+#### triggers
 Cloudwatch rules are in UTC (~ -7/-8hrs to PST)
 
-#### Morningstar API is ready
+##### Morningstar API is ready
 3:22pm, M-F
 - Cloudwatch rule -> schedule -> cron expression: `22 22 ? * MON-FRI *`
 
-#### Tiingo API is ready
-6:45pm, M-F
-- Cloudwatch rule -> schedule -> cron expression: `45 1 ? * TUE-SAT *`
+##### Tiingo API is ready
+6:05pm, M-F
+- Cloudwatch rule -> schedule -> cron expression: `05 1 ? * TUE-SAT *`
 
-### execution role
+#### execution role
 - lambda\_with\_s3
 
-### runtime
+#### runtime
 - 128mb
 - (* 5 60) second timeout
 - No VPC

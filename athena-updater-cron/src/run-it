@@ -24,4 +24,5 @@ refresh_partitions(){
 }
 
 setup && \
-  refresh_partitions "logs" "s3"
+  refresh_partitions "logs" "s3" && \
+  ping_healthchecks "$healthchecks_io_athena_updater_cron"

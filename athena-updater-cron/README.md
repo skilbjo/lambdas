@@ -1,4 +1,4 @@
-## athena-updater 🖥️
+## athena-updater-cron 🖥️
 : keep aws athena up to date
 
 ### what
@@ -18,6 +18,7 @@ deploy/build-project && test/run-tests
 ```bash
 export aws_access_key_id='[data-robot]'
 export aws_secret_access_key='[data-robot]'
+export healthchecks_io_athena_updater_cron=''
 ```
 
 #### triggers
@@ -30,6 +31,9 @@ entrypoint.lambda_handler
 ```
 
 #### execution role
+```bash
+lambda_with_athena_and_s3
+```
 
 #### runtime
 - 128mb

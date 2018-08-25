@@ -22,7 +22,7 @@ deploy/build-project
 ### env vars
 ```bash
 export github_token_encrypted=''
-export hchk=''
+export hchk_ping_it=''
 export slack_api_key=''
 ```
 

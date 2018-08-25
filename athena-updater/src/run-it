@@ -75,4 +75,5 @@ refresh_partitions(){
 }
 
 setup && \
-  refresh_partitions "$sns_event"
+  refresh_partitions "$sns_event" && \
+  ping_healthchecks "$healthchecks_io_athena_updater"
