@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -eou pipefail
 
-sns_event="$1"
-
 setup(){
   src_dir='/var/task'
 

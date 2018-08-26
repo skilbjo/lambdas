@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+tmp_dir="$(mkdir -p /tmp/s3-logs && echo '/tmp/s3-logs')"
+
+get_all_files(){
+  aws --profile personal s3 ls s3://skilbjo-logs/ >"${tmp_dir}/ls"
+}
+
+just_files(){
+  cat "${tmp_dir}/ls" | awk '{print $4}' >"${tmp_dir}/files"
+}
+
+partition(){
+  cat "${tmp_dir}/files" | while read line; do
+    set +u
+    partition="$(if [[ "$line" =~ ([0-9]{4}-[0-9]{2}-[0-9]{2}) ]];then echo "${BASH_REMATCH[1]}" ;fi)"
+
+    if [[ ! -z $partition ]]; then
+      aws s3 cp --profile personal "s3://skilbjo-logs/${line}" "s3://skilbjo-data/logs/s3/s3uploaddate=${partition}/"
+    fi
+    set -u
+  done
+}
+
+partition

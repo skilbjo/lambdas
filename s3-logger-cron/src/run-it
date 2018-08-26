@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+tmp_dir="$(mkdir -p /tmp/s3-logs && echo '/tmp/s3-logs')"
+set +u; _date="$1"; set -u
+
+setup(){
+  _date="$1"
+
+  if [[ $(whoami) = 'sbx'* ]]; then # aws lambda
+    src_dir='/var/task'
+
+    export PATH="${PATH}:${src_dir}"
+
+    source "${src_dir}/athena"
+    source "${src_dir}/util"
+
+    install_dependencies
+    _decrypt_secrets
+
+  else # locally
+    src_dir="$dir"
+
+    source "${src_dir}/athena.user"
+  fi
+
+  set +u
+  if [[ -z $_date ]]; then
+    if [[ $(whoami) = 'sbx'* ]]; then
+      _date=$(date +%F)  # aws lambda
+    else
+      _date=$(gdate +%F) # locally
+    fi
+  fi
+  set -u
+}
+
+get_all_files(){
+  if [[ $(whoami) = 'sbx'* ]]; then # aws lambda
+    aws s3 ls s3://skilbjo-logs/ >"${tmp_dir}/ls"
+  else # locally
+    aws --profile personal s3 ls s3://skilbjo-logs/ >"${tmp_dir}/ls"
+  fi
+}
+
+get_todays_files(){
+  echo "date is: $_date"
+  cat "${tmp_dir}/ls" | grep "$_date" | awk '{print $4}' >"${tmp_dir}/files"
+}
+
+cp_files(){
+  cat "${tmp_dir}/files" | while read line; do
+    set +u
+    partition="$(if [[ "$line" =~ ([0-9]{4}-[0-9]{2}-[0-9]{2}) ]];then echo "${BASH_REMATCH[1]}" ;fi)"
+
+    if [[ ! -z $partition ]]; then
+      if [[ $(whoami) = 'sbx'* ]]; then # aws lambda
+        aws s3 cp "s3://skilbjo-logs/${line}" "s3://skilbjo-data/logs/s3/s3uploaddate=${partition}/"
+      else # locally
+        aws s3 cp --profile personal "s3://skilbjo-logs/${line}" "s3://skilbjo-data/logs/s3/s3uploaddate=${partition}/"
+      fi
+    fi
+    set -u
+  done
+}
+
+setup "$_date" && \
+  get_all_files && \
+  get_todays_files && \
+  cp_files && \
+  ping_healthchecks "$healthchecks_io_s3_logger_cron"
