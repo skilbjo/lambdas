@@ -190,7 +190,7 @@ src_files_clj(){
   # get ready to replace the -main and execute! for all jobs
   sed -i '' -e '56,$ d' "${app}/src/jobs/currency.clj"
   sed -i '' -e '52,$ d' "${app}/src/jobs/economics.clj"
-  sed -i '' -e '234,$ d' "${app}/src/jobs/equities.clj"
+  sed -i '' -e '243,$ d' "${app}/src/jobs/equities.clj"
   sed -i '' -e '70,$ d' "${app}/src/jobs/interest_rates.clj"
   sed -i '' -e '70,$ d' "${app}/src/jobs/real_estate.clj"
   new_entrypoint='
@@ -225,11 +225,12 @@ src_files_clj(){
 
   ## note #_intrinio below
   for _job in "equities"; do
-    sed -i '' '244s/datasets/(concat tiingo morningstar quandl intrinio)/' \
+    sed -i '' '253s/datasets/(concat tiingo morningstar quandl intrinio)/' \
       "${app}/src/jobs/equities.clj"
 
-    sed -i '' -e '248,$ d' "${app}/src/jobs/equities.clj"
+    sed -i '' -e '257,$ d' "${app}/src/jobs/equities.clj"
     main_fn_tail='
+    (println args) (System/exit 0)
       (execute! data))
 
   (util/notify-healthchecks-io (-> :healthchecks-io-api-key env)))'
