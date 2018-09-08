@@ -235,12 +235,11 @@ src_files_clj(){
 
   ## note #_intrinio below
   for _job in "equities"; do
-    sed -i '' '253s/datasets/(concat tiingo morningstar quandl intrinio)/' \
+    sed -i '' '263s/datasets/(concat tiingo morningstar quandl intrinio)/' \
       "${app}/src/jobs/equities.clj"
 
-    sed -i '' -e '257,$ d' "${app}/src/jobs/equities.clj"
+    sed -i '' -e '266,$ d' "${app}/src/jobs/equities.clj"
     main_fn_tail='
-    (println args) (System/exit 0)
       (execute! data))
 
   (util/notify-healthchecks-io (-> :healthchecks-io-api-key env)))'
