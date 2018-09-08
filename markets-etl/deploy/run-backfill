@@ -1,14 +1,6 @@
 #!/usr/bin/env bash
 set -eou pipefail
 
-# get beginning of year
-deploy/build-project && lein uberjar && lein run -m jobs.aws-lambda
-
-# move it to the correct partition
-aws --profile personal \
-  s3 mv \
-  "s3://skilbjo-data/datalake/markets-etl/equities_fact/s3uploaddate=$(date +%F)/equities.csv" \
-  "s3://skilbjo-data/datalake/markets-etl/equities_fact/s3uploaddate=2018-01-02/equities.csv"
-
-# load back the correct partition
-test/run-test
+deploy/build-project && \
+  lein uberjar && \
+  lein run -m jobs.aws-lambda --date "2018-01-02"

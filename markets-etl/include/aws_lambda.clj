@@ -22,46 +22,39 @@
    ["-h" "--help"]])
 
 (defn -main [& args]
-  (let [{:keys [options summary errors]} (cli/parse-opts args cli-options)]
+  (let [{:keys [options summary errors]} (cli/parse-opts args cli-options)
+        date                             (-> options :date)]
     (log/info "Starting jobs... ")
-    ;(log/info "Currency... ")
-    ;(currency/-main '-d (-> options :date))
-
-    ;(log/info "Economics... ")
-    ;(economics/-main '-d (-> options :date))
-
-    ;(log/info "Equities... ")
-    ;(equities/-main '-d (-> options :date))
-
-    ;(log/info "Interest rates... ")
-    ;(interest-rates/-main '-d (-> options :date))
-
-    ;(log/info "Real estate... ")
-    ;(real-estate/-main '-d (-> options :date))
-
-    (log/info "Equities... ")
-    ;(equities/-main "-d" "2018-01-02")
-    (equities/-main "-d" (-> options :date))
+    (currency/-main  "-d" date)
+    (economics/-main "-d" date)
+    (equities/-main  "-d" date)
+    (real-estate/-main "-d" date)
+    (interest-rates/-main "-d" date)
     (log/info "Finished!")))
 
 (defn main [& args]
-  (let [_              (log/info "Starting jobs... ")
-        _              (log/info "Currency... ")
-        currency       (currency/-main)
-        _              (log/info "Economics... ")
-        economics      (economics/-main)
-        _              (log/info "Equities... ")
-        equities       (equities/-main)
-        _              (log/info "Interest rates... ")
-        interest-rates (interest-rates/-main)
-        _              (log/info "Real estate... ")
-        real-estate    (real-estate/-main)
-        _              (log/info "Finished!")]
+  (log/info "Starting jobs... ")
 
-    (log/info "Notifying healthchecks.io ... ")
-    (util/notify-healthchecks-io (-> :healthchecks-io-api-key
-                                     env
-                                     util/decrypt))))
+  (log/info "Currency... ")
+  (currency/-main)
+
+  (log/info "Economics... ")
+  (economics/-main)
+
+  (log/info "Equities... ")
+  (equities/-main)
+
+  (log/info "Interest rates... ")
+  (interest-rates/-main)
+
+  (log/info "Real estate... ")
+  (real-estate/-main)
+
+  (log/info "Finished!")
+  (log/info "Notifying healthchecks.io ... ")
+  (util/notify-healthchecks-io (-> :healthchecks-io-api-key
+                                   env
+                                   util/decrypt)))
 
 (defn -handleRequest [_ event _ context]
   (let [event' (-> event
