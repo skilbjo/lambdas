@@ -127,7 +127,7 @@ sql_clj(){
   ([opts rows]
    (sequence (vectorize* opts) rows)))
 
-(defn insert-to-athena [job coll]
+(defn insert-to-athena [job date coll]
   (let [dataset        (-> coll first :dataset)
         convert-to-csv (fn [row]
                          (io/delete-file (str "/tmp/"
@@ -143,7 +143,7 @@ sql_clj(){
                                             job
                                             "_fact"
                                             "/s3uploaddate="
-                                            util/now
+                                            date
                                             "/"
                                             job
                                             ".csv")]
@@ -188,26 +188,36 @@ project_clj(){
 
 src_files_clj(){
   # get ready to replace the -main and execute! for all jobs
-  sed -i '' -e '56,$ d' "${app}/src/jobs/currency.clj"
-  sed -i '' -e '52,$ d' "${app}/src/jobs/economics.clj"
-  sed -i '' -e '234,$ d' "${app}/src/jobs/equities.clj"
-  sed -i '' -e '70,$ d' "${app}/src/jobs/interest_rates.clj"
-  sed -i '' -e '70,$ d' "${app}/src/jobs/real_estate.clj"
+  sed -i '' -e '65,$ d' "${app}/src/jobs/currency.clj"
+  sed -i '' -e '61,$ d' "${app}/src/jobs/economics.clj"
+  sed -i '' -e '243,$ d' "${app}/src/jobs/equities.clj"
+  sed -i '' -e '79,$ d' "${app}/src/jobs/interest_rates.clj"
+  sed -i '' -e '79,$ d' "${app}/src/jobs/real_estate.clj"
   new_entrypoint='
-(defn execute! [data]
+(defn execute! [date data]
   (->> data
        (map prepare-row)
        flatten
-       (sql/insert-to-athena (-> *ns* str (string/split #"\.") second))
+       (sql/insert-to-athena (-> *ns* str (string/split #"\.") second) date)
        doall))
 
 (defn -main [& args]
   (error/set-default-error-handler)
-  (let [data        (->> datasets
-                         (map #(api/get-data % query-params))
+  (let [{:keys [options summary errors]} (cli/parse-opts args cli-options)
+        query-params*        (if args
+                               {:limit      (:limit query-params)
+                                :start_date (-> options
+                                                :date
+                                                util/joda-date->date-str)
+                                :end_date   (-> options
+                                                :date
+                                                util/joda-date->date-str)}
+                               query-params)
+        data        (->> datasets
+                         (map #(api/get-data % query-params*))
                          flatten)]
 
-    (execute! data)))'
+    (execute! (-> query-params* :start_date) data)))'
 
   declare -a _jobs=("currency" "equities" "economics" "interest_rates" "real_estate")
 
@@ -225,12 +235,12 @@ src_files_clj(){
 
   ## note #_intrinio below
   for _job in "equities"; do
-    sed -i '' '244s/datasets/(concat tiingo morningstar quandl intrinio)/' \
+    sed -i '' '263s/datasets/(concat tiingo morningstar quandl intrinio)/' \
       "${app}/src/jobs/equities.clj"
 
-    sed -i '' -e '248,$ d' "${app}/src/jobs/equities.clj"
+    sed -i '' -e '266,$ d' "${app}/src/jobs/equities.clj"
     main_fn_tail='
-      (execute! data))
+      (execute! (-> query-params* :start_date) data))
 
   (util/notify-healthchecks-io (-> :healthchecks-io-api-key env)))'
 

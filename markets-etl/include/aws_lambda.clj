@@ -1,6 +1,10 @@
 (ns jobs.aws-lambda
-  (:require [clojure.data.json :as json]
+  (:require [clj-time.core :as time]
+            [clj-time.format :as format]
+            [clojure.data.json :as json]
             [clojure.java.io :as io]
+            [clojure.tools.cli :as cli]
+            [clojure.tools.logging :as log]
             [environ.core :refer [env]]
             [jobs.currency :as currency]
             [jobs.economics :as economics]
@@ -12,30 +16,45 @@
     :name jobs.aws-lambda
     :implements [com.amazonaws.services.lambda.runtime.RequestStreamHandler]))
 
-(defn main []
-  (let [_              (println "Starting jobs... ")
+(def cli-options
+  [["-d" "--date DATE" "Start date (month) (yyyy-mm-dd format) to start processing"
+    :default  util/last-week]
+   ["-h" "--help"]])
 
-        _              (println "Currency... ")
-        currency       (currency/-main)
+(defn -main [& args]
+  (let [{:keys [options summary errors]} (cli/parse-opts args cli-options)
+        date                             (-> options :date)]
+    (log/info "Starting jobs... ")
+    (currency/-main  "-d" date)
+    (economics/-main "-d" date)
+    (equities/-main  "-d" date)
+    (real-estate/-main "-d" date)
+    (interest-rates/-main "-d" date)
+    (log/info "Finished!")))
 
-        _              (println "Economics... ")
-        econmics       (economics/-main)
+(defn main [& args]
+  (log/info "Starting jobs... ")
 
-        _              (println "Equities... ")
-        equities       (equities/-main)
+  (log/info "Currency... ")
+  (currency/-main)
 
-        _              (println "Interest rates... ")
-        interest-rates (interest-rates/-main)
+  (log/info "Economics... ")
+  (economics/-main)
 
-        _              (println "Real estate... ")
-        real-estate    (real-estate/-main)
+  (log/info "Equities... ")
+  (equities/-main)
 
-        _              (println "Notifying healthchecks.io ... ")
-        _              (util/notify-healthchecks-io (-> :healthchecks-io-api-key
-                                                        env
-                                                        util/decrypt))
+  (log/info "Interest rates... ")
+  (interest-rates/-main)
 
-        _              (println "Finished!")]))
+  (log/info "Real estate... ")
+  (real-estate/-main)
+
+  (log/info "Finished!")
+  (log/info "Notifying healthchecks.io ... ")
+  (util/notify-healthchecks-io (-> :healthchecks-io-api-key
+                                   env
+                                   util/decrypt)))
 
 (defn -handleRequest [_ event _ context]
   (let [event' (-> event

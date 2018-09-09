@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -eou pipefail
+
+deploy/build-project && \
+  lein uberjar && \
+  lein run -m jobs.aws-lambda --date "2018-01-02"
