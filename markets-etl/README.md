@@ -16,6 +16,7 @@ run deploy/build-project
 export healthchecks_io_api_key=''
 export quandl_api_key=''
 export tiingo_api_key=''
+export alpha_vantage_api_key=''
 ```
 
 #### execution role
