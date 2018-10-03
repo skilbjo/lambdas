@@ -190,7 +190,7 @@ src_files_clj(){
   # get ready to replace the -main and execute! for all jobs
   sed -i '' -e '65,$ d' "${app}/src/jobs/currency.clj"
   sed -i '' -e '61,$ d' "${app}/src/jobs/economics.clj"
-  sed -i '' -e '283,$ d' "${app}/src/jobs/equities.clj"
+  sed -i '' -e '286,$ d' "${app}/src/jobs/equities.clj"
   sed -i '' -e '79,$ d' "${app}/src/jobs/interest_rates.clj"
   sed -i '' -e '79,$ d' "${app}/src/jobs/real_estate.clj"
   new_entrypoint='
@@ -235,10 +235,10 @@ src_files_clj(){
 
   ## note #_intrinio below
   for _job in "equities"; do
-    sed -i '' '303s/datasets/(concat alpha-vantage tiingo morningstar quandl intrinio)/' \
+    sed -i '' '306s/datasets/(concat alpha-vantage tiingo morningstar quandl intrinio)/' \
       "${app}/src/jobs/equities.clj"
 
-    sed -i '' -e '307,$ d' "${app}/src/jobs/equities.clj"
+    sed -i '' -e '310,$ d' "${app}/src/jobs/equities.clj"
     main_fn_tail='
       (execute! (-> query-params* :start_date) data))
 
