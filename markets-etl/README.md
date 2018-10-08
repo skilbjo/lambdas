@@ -19,6 +19,19 @@ export tiingo_api_key=''
 export alpha_vantage_api_key=''
 ```
 
+Note: if you get this error:
+
+```bash
+com.amazonaws.services.kms.model.InvalidCiphertextException: null (Service:
+AWSKMS; Status Code: 400; Error Code: InvalidCiphertextException; Request ID:
+4fa8c287-5a02-45a5-9d83-eeb199d74fa4), compiling:(api.clj:33:31) Exception in
+thread "main" com.amazonaws.services.kms.model.InvalidCiphertextException: null
+(Service: AWSKMS; Status Code: 400; Error Code: InvalidCiphertextException;
+Request ID: 4fa8c287-5a02-45a5-9d83-eeb199d74fa4), compiling:(api.clj:33:31)
+```
+
+Make sure the environment variables above have been set at compile time.
+
 #### execution role
 - lambda\_with\_s3
 
