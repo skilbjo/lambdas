@@ -280,6 +280,11 @@ add_lambda_wrappers(){
   src_files_clj
 }
 
-copy_files
-add_aws_lambda_clj
-add_lambda_wrappers
+rm_unnecessary_files(){
+  if [[ -d ${app}/src/backfill   ]]; then rm -r ${app}/src/backfill; fi
+}
+
+copy_files && \
+  add_aws_lambda_clj && \
+  add_lambda_wrappers && \
+  rm_unnecessary_files
