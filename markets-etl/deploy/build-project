@@ -73,13 +73,13 @@ util_clj(){
 sql_clj(){
   sed -i '' -e '1,6d;' "${app}/src/markets_etl/sql.clj"
 
-  local header='
-(ns markets-etl.sql
+  local header='(ns markets-etl.sql
   (:require [amazonica.aws.s3 :as s3]
             [clojure.string :as string]
             [clojure.data.csv :as csv]
             [clojure.java.jdbc :as jdbc]
             [clojure.java.io :as io]
+            [clojure.java.shell :as shell]
             [clojure.tools.logging :as log]
             [environ.core :refer [env]]
             [markets-etl.util :as util])
@@ -138,6 +138,18 @@ sql_clj(){
                                                             job
                                                             ".csv"))]
                            (csv/write-csv writer row)))
+        gzip-csv       (fn []
+                         (println (:out
+                         (shell/sh "bash" "-c"
+                                    "ls" "-lh" "/tmp/" job ".csv")))
+                         (println (:err
+                         (shell/sh "bash" "-c"
+                                   "gzip" "-9" (str "/tmp/" job ".csv"))
+                         ))
+                         (println (:out
+                         (shell/sh "bash" "-c"
+                                   "ls" "-lh" "/tmp/" job ".csv"))
+                                   ))
         s3-put         (fn [job]
                          (let [s3-path (str "datalake/markets-etl/"
                                             job
@@ -153,10 +165,12 @@ sql_clj(){
                                           :metadata    {:server-side-encryption "AES256"}
                                           :file        (str "/tmp/"
                                                             job
-                                                            ".csv"))))]
+                                                            ".csv.gz"))))]
     (->> coll
          vectorize
          convert-to-csv)
+
+    (gzip-csv)
 
     (if (empty? (first coll))
       '"'"'()  ; this is a quoted empty list, ie exit early
