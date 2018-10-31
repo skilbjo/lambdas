@@ -96,7 +96,7 @@ s3_portion='{
                     "arn": "arn:aws:s3:::skilbjo-data"
                 },
                 "object": {
-                    "key": "data/stripe/events.csv",
+                    "key": "data/stripe/events.csv.gz",
                     "size": 6025472,
                     "eTag": "dc2cf0e7b82f52c0379c2802688f34d5",
                     "sequencer": "005B57BC03B14B4732"
@@ -110,6 +110,6 @@ file_jq='.Records[].s3.object.key'
 
 file_json="$(echo "$s3_portion" | jq -r "$file_jq")"
 
-file=$(basename $file_json .csv)
+file=$(basename $file_json .csv.gz)
 
 echo "$file"
