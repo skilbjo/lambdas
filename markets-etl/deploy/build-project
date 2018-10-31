@@ -139,17 +139,8 @@ sql_clj(){
                                                             ".csv"))]
                            (csv/write-csv writer row)))
         gzip-csv       (fn []
-                         (println (:out
-                         (shell/sh "bash" "-c"
-                                    "ls" "-lh" "/tmp/" job ".csv")))
-                         (println (:err
-                         (shell/sh "bash" "-c"
-                                   "gzip" "-9" (str "/tmp/" job ".csv"))
-                         ))
-                         (println (:out
-                         (shell/sh "bash" "-c"
-                                   "ls" "-lh" "/tmp/" job ".csv"))
-                                   ))
+                         (let [gzip-cmd (str "gzip" " -9 " "/tmp/" job ".csv")]
+                           (shell/sh "bash" "-c" gzip-cmd)))
         s3-put         (fn [job]
                          (let [s3-path (str "datalake/markets-etl/"
                                             job
@@ -158,7 +149,7 @@ sql_clj(){
                                             date
                                             "/"
                                             job
-                                            ".csv")]
+                                            ".csv.gz")]
                            (log/info "s3-path is:" s3-path)
                            (s3/put-object :bucket-name "skilbjo-data"
                                           :key         s3-path
