@@ -193,16 +193,17 @@ project_clj(){
 
 src_files_clj(){
   # get ready to replace the -main and execute! for all jobs
-  sed -i '' -e '65,$ d' "${app}/src/jobs/currency.clj"
-  sed -i '' -e '61,$ d' "${app}/src/jobs/economics.clj"
+  sed -i '' -e '93,$ d' "${app}/src/jobs/currency.clj"
+  sed -i '' -e '60,$ d' "${app}/src/jobs/economics.clj"
   sed -i '' -e '286,$ d' "${app}/src/jobs/equities.clj"
-  sed -i '' -e '79,$ d' "${app}/src/jobs/interest_rates.clj"
-  sed -i '' -e '79,$ d' "${app}/src/jobs/real_estate.clj"
+  sed -i '' -e '78,$ d' "${app}/src/jobs/interest_rates.clj"
+  sed -i '' -e '78,$ d' "${app}/src/jobs/real_estate.clj"
   new_entrypoint='
 (defn execute! [date data]
   (->> data
        (map prepare-row)
        flatten
+       (remove nil?)
        (sql/insert-to-athena (-> *ns* str (string/split #"\.") second) date)
        doall))
 
@@ -238,9 +239,13 @@ src_files_clj(){
     sed -i '' "s/\*ns\*/\"jobs\.${_job}\"/g" "${app}/src/jobs/${_job}.clj"
   done
 
-  ## note #_intrinio below
+  for _job in "currency"; do
+    sed -i '' '114s/datasets/(concat alpha-vantage quandl)/' \
+      "${app}/src/jobs/currency.clj"
+  done
+
   for _job in "equities"; do
-    sed -i '' '306s/datasets/(concat alpha-vantage tiingo morningstar quandl intrinio)/' \
+    sed -i '' '307s/datasets/(concat alpha-vantage tiingo morningstar quandl intrinio)/' \
       "${app}/src/jobs/equities.clj"
 
     sed -i '' -e '310,$ d' "${app}/src/jobs/equities.clj"
