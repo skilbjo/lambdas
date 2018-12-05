@@ -7,8 +7,26 @@ markets-etl, but in lambda form
 
 ### build
 ```bash
-run deploy/build-project
+deploy/build-project && lein uberjar
 ```
+
+### run backfill
+```bash
+deploy/run-backfill
+```
+
+or
+
+```bash
+deploy/build-project && lein uberjar
+
+lein run -m jobs.aws-lambda --date "2018-01-02"
+```
+
+#### manually insert data
+
+TODO: write about how to manually insert data when no data present, such as an
+IPO.
 
 ### config
 #### env vars
@@ -30,7 +48,12 @@ thread "main" com.amazonaws.services.kms.model.InvalidCiphertextException: null
 Request ID: 4fa8c287-5a02-45a5-9d83-eeb199d74fa4), compiling:(api.clj:33:31)
 ```
 
-Make sure the environment variables above have been set at compile time.
+Make sure the environment variables above have been set at compile time:
+
+```bash
+export AWS_ACCESS_KEY_ID=''
+export AWS_SECRET_ACCESS_KEY=''
+```
 
 #### execution role
 - lambda\_with\_s3
