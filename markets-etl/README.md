@@ -23,10 +23,18 @@ deploy/build-project && lein uberjar
 lein run -m jobs.aws-lambda --date "2018-01-02"
 ```
 
-#### manually insert data
+#### Manually Insert Data
 
-TODO: write about how to manually insert data when no data present, such as an
-IPO.
+Sometimes you'll need to manually insert data when no data present for the
+beginning of the year, yet you still want to show YTD results. A reason why you
+would want to do this, for example, is an IPO that happened in the middle of
+the year. Manually inserting the IPO share price on the first day of the year
+is a good strategy for this.
+
+To do this, manually download the csv for the first day of the year's
+partition, and manually edit the csv to include this data (or just copy paste
+the respective row from the IPO date's row), and re-upload the file to the
+first day of the year's partition.
 
 ### config
 #### env vars
