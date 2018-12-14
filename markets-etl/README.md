@@ -30,7 +30,24 @@ thread "main" com.amazonaws.services.kms.model.InvalidCiphertextException: null
 Request ID: 4fa8c287-5a02-45a5-9d83-eeb199d74fa4), compiling:(api.clj:33:31)
 ```
 
+or
+
+```bash
+Caused by: com.amazonaws.services.kms.model.AWSKMSException: The ciphertext
+refers to a customer master key that does not exist, does not exist in this
+region, or you are not allowed to access. (Service: AWSKMS; Status Code: 400;
+Error Code: AccessDeniedException; Request ID:
+cc225d2e-87cb-4abb-b125-4ac9b02bc4b6)
+```
+
 Make sure the environment variables above have been set at compile time.
+
+```bash
+export aws_access_key_id="$(cat ~/.aws/credentials | grep -A 2 skilbjo-robot | grep aws_access_key_id | awk '{print $3}')"
+export aws_secret_access_key="$(cat ~/.aws/credentials | grep -A 2 skilbjo-robot | grep aws_secret_access_key | awk '{print $3}')"
+export AWS_ACCESS_KEY_ID=$aws_access_key_id
+export AWS_SECRET_ACCESS_KEY=$aws_secret_access_key
+```
 
 #### execution role
 - lambda\_with\_s3
