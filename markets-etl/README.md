@@ -7,8 +7,34 @@ markets-etl, but in lambda form
 
 ### build
 ```bash
-run deploy/build-project
+deploy/build-project && lein uberjar
 ```
+
+### run backfill
+```bash
+deploy/run-backfill
+```
+
+or
+
+```bash
+deploy/build-project && lein uberjar
+
+lein run -m jobs.aws-lambda --date "2018-01-02"
+```
+
+#### Manually Insert Data
+
+Sometimes you'll need to manually insert data when no data present for the
+beginning of the year, yet you still want to show YTD results. A reason why you
+would want to do this, for example, is an IPO that happened in the middle of
+the year. Manually inserting the IPO share price on the first day of the year
+is a good strategy for this.
+
+To do this, manually download the csv for the first day of the year's
+partition, and manually edit the csv to include this data (or just copy paste
+the respective row from the IPO date's row), and re-upload the file to the
+first day of the year's partition.
 
 ### config
 #### env vars
@@ -40,7 +66,7 @@ Error Code: AccessDeniedException; Request ID:
 cc225d2e-87cb-4abb-b125-4ac9b02bc4b6)
 ```
 
-Make sure the environment variables above have been set at compile time.
+Make sure the environment variables above have been set at compile time:
 
 ```bash
 export aws_access_key_id="$(cat ~/.aws/credentials | grep -A 2 skilbjo-robot | grep aws_access_key_id | awk '{print $3}')"
