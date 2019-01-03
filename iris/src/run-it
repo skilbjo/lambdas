@@ -13,7 +13,7 @@ setup(){
 }
 
 run_docker() {
-  local image="quay.io/skilbjo/iris:minicon"
+  local image="quay.io/skilbjo/iris:debian-minicon"
   local cmd="/usr/local/deploy/bin/run-job"
 
   udocker pull "$image"
