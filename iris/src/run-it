@@ -29,6 +29,8 @@ run_docker() {
     --env="aws_access_key_id=${aws_access_key_id}" \
     --env="aws_secret_access_key=${aws_secret_access_key}" \
     _ /bin/bash -c '/usr/local/deploy/bin/run-job'
+
+  udocker rm _            # rm cache
 }
 
 setup && \
