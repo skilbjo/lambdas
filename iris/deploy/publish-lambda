@@ -36,17 +36,17 @@ add_bin(){
 
   # aws ; docs: https://alestic.com/2016/11/aws-lambda-awscli/
   (
-    virtualenv="virtual-env"
+    venv_name='awscli-in-lambda'
     mkdir -p tmp
-    cd tmp; virtualenv --python=$(which python2) virtual-env
-    set +u
-    source virtual-env/bin/activate
-    set -u
-    pip install awscli # add any addtl libraries here; or requirements.txt
-    rsync -va "virtual-env/bin/aws" aws
-    perl -pi -e '$_ = "#!/usr/bin/python\n" if $. == 1' aws
+    cd tmp; virtualenv --python=$(which python3) "$venv_name"
+    set +u; source "${venv_name}/bin/activate"; set -u
+    python3_version="$(python -V | cut -c8-10)"
+    pip3 install awscli # add any addtl libraries here; or requirements.txt
+    rsync -va "${venv_name}/bin/aws" aws
+    #perl -pi -e '$_ = "#!/usr/bin/python\n" if $. == 1' aws
+    perl -pi -e '$_ = "#!/usr/bin/python3\n" if $. == 1' aws
     zip -r9 "$zipfile" aws
-    cd "virtual-env/lib/python2.7/site-packages"; zip -r9 "$zipfile" .
+    cd "${venv_name}/lib/python${python3_version}/site-packages"; rm -r awscli/examples; zip -r9 "$zipfile" .
     cd - && cd ../ && rm -r tmp
   )
 }
@@ -96,7 +96,7 @@ new(){
     --zip-file 'fileb://app.zip' \
     --role arn:aws:iam::470340682667:role/lambda_with_s3 \
     --handler 'entrypoint.lambda_handler' \
-    --runtime 'python3.6' \
+    --runtime 'python3.7' \
     --timeout 300 \
     --memory-size 128
 
