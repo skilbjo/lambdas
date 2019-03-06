@@ -10,4 +10,4 @@ cd "${dir}/.."
 curl https://raw.githubusercontent.com/grycap/scar/master/lambda/udocker >resources/udocker
 
 # up to date
-curl https://github.com/grycap/scar/blob/master/src/providers/aws/cloud/lambda/udocker/udocker.py >resources/udocker
+curl https://raw.githubusercontent.com/grycap/scar/master/src/providers/aws/cloud/lambda/udocker/udocker.py >resources/udocker
