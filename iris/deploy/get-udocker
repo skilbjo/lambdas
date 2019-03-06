@@ -8,3 +8,6 @@ cd "${dir}/.."
 
 # this out-of-date version seems the only version of the script working atm
 curl https://raw.githubusercontent.com/grycap/scar/master/lambda/udocker >resources/udocker
+
+# up to date
+curl https://github.com/grycap/scar/blob/master/src/providers/aws/cloud/lambda/udocker/udocker.py >resources/udocker
