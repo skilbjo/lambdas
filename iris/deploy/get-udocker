@@ -13,4 +13,4 @@ curl https://raw.githubusercontent.com/grycap/scar/master/lambda/udocker >resour
 curl https://raw.githubusercontent.com/grycap/scar/master/src/providers/aws/cloud/lambda/udocker/udocker.py >resources/udocker
 
 # saved version
-https://raw.githubusercontent.com/skilbjo/lambdas/master/iris/resources/udocker >resources/udocker
+curl https://raw.githubusercontent.com/skilbjo/lambdas/master/iris/resources/udocker >resources/udocker
