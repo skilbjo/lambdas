@@ -204,6 +204,7 @@ src_files_clj(){
        (map prepare-row)
        flatten
        (remove nil?)
+       (filter #(= (coerce/to-sql-date date) (:date %)))
        (sql/insert-to-athena (-> *ns* str (string/split #"\.") second) date)
        doall))
 
