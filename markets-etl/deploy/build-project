@@ -140,7 +140,9 @@ sql_clj(){
                                                             ".csv"))]
                            (csv/write-csv writer row)))
         gzip-csv       (fn [job]
-                         (let [gzip-cmd (str "gzip" " -9 " "/tmp/" job ".csv")]
+                         (let [clean-cmd (str "if [[ -f /tmp/" job ".csv.gz ]]; then rm /tmp/" job ".csv.gz; fi")
+                               gzip-cmd  (str "gzip" " -9 " "/tmp/" job ".csv")]
+                           (shell/sh "bash" "-c" clean-cmd)
                            (shell/sh "bash" "-c" gzip-cmd)))
         s3-put         (fn [job]
                          (let [s3-path (str "datalake/markets-etl/"

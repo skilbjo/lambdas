@@ -29,7 +29,7 @@
         _       (println "Running msck repair table on " table)
         results (util/exponential-backoff 1 2 180
                                           #(sql/query-athena "msck repair table :schema.:table;"
-                                                             {:schema "dw"
+                                                             {:schema "datalake"
                                                               :table table}))
         _              (println "Finished!")]))
 
