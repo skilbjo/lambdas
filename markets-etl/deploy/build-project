@@ -168,7 +168,7 @@ sql_clj(){
 
     (if (empty? (first coll))
       '"'"'()  ; this is a quoted empty list, ie exit early
-      (s3-put job))))'
+      (s3-put job*))))'
 
   echo "$athena" >>"${app}/src/markets_etl/sql.clj"
 }
