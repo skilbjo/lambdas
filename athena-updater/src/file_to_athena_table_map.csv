@@ -1,6 +1,8 @@
 file,schema,table
-equities,dw,equities_fact
-economics,dw,economics_fact
-currency,dw,currency_fact
-interest_rates,dw,interest_rates_fact
-real_estate,dw,real_estate_fact
+equities,datalake,equities
+economics,datalake,economics
+currency,datalake,currency
+interest_rates,datalake,interest_rates
+real_estate,datalake,real_estate
+interest-rates,datalake,interest_rates
+real-estate,datalake,real_estate
