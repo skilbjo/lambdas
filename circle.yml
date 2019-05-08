@@ -1,0 +1,30 @@
+
+version: 2
+jobs:
+  run_it:
+    working_directory: ~/lambdas
+    machine: true
+    environment:
+      - PATH: /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/circleci/.local/bin
+    steps:
+      - checkout
+      - run: git clone https://github.com/skilbjo/markets-etl.git ~/markets-etl
+      - run: docker info >/dev/null 2>&1 || service docker start
+      - run: cd ~/markets-etl; deploy/bin/run-docker 'jobs.currency'
+      - run: cd ~/markets-etl; deploy/bin/run-docker 'jobs.equities'
+
+workflows:
+  version: 2
+  scheduled_job:
+    jobs:
+      - run_it
+    triggers:
+      - schedule:
+          cron: '0 2,3,4 * * *' # 7,8,9pm PST
+          filters:
+            branches:
+              only:
+                master
+  commit:
+    jobs:
+      - run_it
