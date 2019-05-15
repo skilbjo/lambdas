@@ -10,8 +10,7 @@ jobs:
       - checkout
       - run: git clone https://github.com/skilbjo/markets-etl.git ~/markets-etl
       - run: docker info >/dev/null 2>&1 || service docker start
-      - run: cd ~/markets-etl; deploy/bin/run-docker 'jobs.currency'
-      - run: cd ~/markets-etl; deploy/bin/run-docker 'jobs.equities'
+      - run: cd ~/markets-etl; deploy/bin/run-docker 's3.aws-lambda'
 
 workflows:
   version: 2
@@ -20,7 +19,7 @@ workflows:
       - run_it
     triggers:
       - schedule:
-          cron: '0 2,3,4 * * *' # 7,8,9pm PST
+          cron: '0 3 * * *' # 7,8,9pm PST
           filters:
             branches:
               only:
