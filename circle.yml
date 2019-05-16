@@ -10,7 +10,7 @@ jobs:
       - checkout
       - run: git clone https://github.com/skilbjo/markets-etl.git ~/markets-etl
       - run: docker info >/dev/null 2>&1 || service docker start
-      - run: cd ~/markets-etl; deploy/bin/run-docker 's3.aws-lambda'
+      - run: cd ~/markets-etl; deploy/bin/run-docker '-m s3.aws-lambda'
 
 workflows:
   version: 2
