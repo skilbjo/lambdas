@@ -9,9 +9,11 @@ jobs:
     steps:
       - checkout
       - run: git clone https://github.com/skilbjo/markets-etl.git ~/markets-etl
+      - run: git clone https://github.com/skilbjo/iris.git        ~/iris
       - run: docker info >/dev/null 2>&1 || service docker start
       - run: mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
       - run: cd ~/markets-etl; deploy/bin/run-docker '-m s3.aws-lambda'
+      - run: cd ~/iris; deploy/bin/run-docker
 
 workflows:
   version: 2
