@@ -1,23 +1,35 @@
 #!/usr/bin/env bash
 set -eou pipefail
 
+tmp_dir='/tmp'
+project_dir="/${tmp_dir}/ping-it"
+
 setup(){
-  src_dir='/var/task'
+  local src_dir='/var/task'
 
   export PATH="${PATH}:${src_dir}"
 
   source "${src_dir}/util"
 
+  if [[ $(whoami) == 'sbx_'* ]]; then rm -rf "${tmp_dir}/"*; fi   # Needed, or clone will fail
+
   install_dependencies
   _decrypt_secrets
+
+  mkdir -p "${tmp_dir}/ping-it"
+  git clone https://github.com/skilbjo/ping-it.git "${tmp_dir}/ping-it"
 }
 
-setup
+ping_it(){
+  local cmd='deploy/bin/run-job'
 
-cd /tmp && git clone https://github.com/skilbjo/ping-it.git
-cd ping-it && deploy/bin/run-job
-git push "https://skilbjo:${github_token}@github.com/skilbjo/ping-it.git"
-cd -
+  cd "$project_dir"
 
-ping_healthchecks "$hchk_ping_it"
-slack "ping-it: i ran"
+  "$cmd" && \
+  git push "https://skilbjo:${github_token}@github.com/skilbjo/ping-it.git" && \
+    ping_healthchecks "$hchk_ping_it" && \
+    slack "ping-it: i ran"
+}
+
+setup && \
+  ping_it
