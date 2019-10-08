@@ -22,7 +22,7 @@ get_file(){
 
   file_json="$(echo "$s3_event" | jq -r "$file_jq")"
 
-  file=$(basename $file_json .csv.gz)
+  file=$(basename $file_json .orc)
 
   echo "$file"
 }
