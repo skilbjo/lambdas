@@ -13,23 +13,25 @@
             [jobs.real-estate :as real-estate]
             [markets-etl.util :as util])
   (:gen-class
-    :name jobs.aws-lambda
-    :implements [com.amazonaws.services.lambda.runtime.RequestStreamHandler]))
+   :name jobs.aws-lambda
+   :implements [com.amazonaws.services.lambda.runtime.RequestStreamHandler]))
 
 (def cli-options
   [["-d" "--date DATE" "Start date (month) (yyyy-mm-dd format) to start processing"
-    :default  util/last-week]
+    :default  util/yesterday]
    ["-h" "--help"]])
 
 (defn -main [& args]
   (let [{:keys [options summary errors]} (cli/parse-opts args cli-options)
         date                             (-> options :date)]
     (log/info "Starting jobs... ")
-    (currency/-main  "-d" date)
-    (economics/-main "-d" date)
-    (equities/-main  "-d" date)
-    (real-estate/-main "-d" date)
+    (currency/-main "-d" date)
+    (equities/-main "-d" date)
+    (economics/-main      "-d" date)
+    (real-estate/-main    "-d" date)
     (interest-rates/-main "-d" date)
+    (log/info "Notifying healthchecks.io ... ")
+    (util/notify-healthchecks-io (-> :healthchecks-io-api-key env))
     (log/info "Finished!")))
 
 (defn main [& args]
@@ -52,9 +54,7 @@
 
   (log/info "Finished!")
   (log/info "Notifying healthchecks.io ... ")
-  (util/notify-healthchecks-io (-> :healthchecks-io-api-key
-                                   env
-                                   util/decrypt)))
+  (util/notify-healthchecks-io (-> :healthchecks-io-api-key env util/decrypt)))
 
 (defn -handleRequest [_ event _ context]
   (let [event' (-> event
