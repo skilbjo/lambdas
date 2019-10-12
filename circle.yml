@@ -1,7 +1,6 @@
-
 version: 2
 jobs:
-  run_it:
+  markets_etl_and_iris:
     working_directory: ~/lambdas
     machine: true
     environment:
@@ -14,12 +13,36 @@ jobs:
       - run: mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
       - run: cd ~/markets-etl; deploy/bin/run-docker '-m s3.aws-lambda'
       - run: cd ~/iris; deploy/bin/run-docker 'daily'
+  bash_etl_insights:
+    working_directory: ~/lambdas
+    machine: true
+    environment:
+      - PATH: /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/circleci/.local/bin
+    steps:
+      - checkout
+      - run: git clone https://github.com/skilbjo/bash-etl.git ~/bash-etl
+      - run: docker info >/dev/null 2>&1 || service docker start
+      - run: mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
+      - run: cd ~/bash-etl; deploy/bin/run-docker 'insights'
 
 workflows:
   version: 2
-  scheduled_job:
+  bash_etl_insights:
     jobs:
-      - run_it
+      - bash_etl_insights
+    triggers:
+      - schedule:
+          cron: '0 3 * * *' # 8pm PST
+          filters:
+            branches:
+              only:
+                master
+    commit:       # uncomment to run on commits
+      jobs:
+        - run_it
+  friday_night:
+    jobs:
+      - markets_etl_and_iris
     triggers:
       - schedule:
           cron: '0 3 * * 6' # 7,8,9pm PST # 0 2,3,4 * * 2-6  # Just leave on Fri so not to run up aws costs
