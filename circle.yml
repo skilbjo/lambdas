@@ -37,9 +37,9 @@ workflows:
             branches:
               only:
                 master
-    commit:       # uncomment to run on commits
-      jobs:
-        - run_it
+  commit:       # uncomment to run on commits
+    jobs:
+      - bash_etl_insights
   friday_night:
     jobs:
       - markets_etl_and_iris
