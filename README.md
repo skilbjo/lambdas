@@ -5,6 +5,8 @@
 
 [![markets-etl_lambda](https://healthchecks.io/badge/80da65e9-ff8f-45f1-b75e-109790/_G-pE-FA/markets-etl.svg)](https://healthchecks.io/badge/80da65e9-ff8f-45f1-b75e-109790/_G-pE-FA/markets-etl.svg)
 
+![Insights](https://github.com/skilbjo/lambdas/workflows/bash-etl/badge.svg)
+
 ### lambdas
 #### aws-anarchy 🖥️
 Perform management operations on AWS, such as shuffle data around S3, and keeping
