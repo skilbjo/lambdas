@@ -1,0 +1,22 @@
+name: bash-etl
+#on:
+  #schedule:
+    #- cron:  '0 3 * * *'
+
+on: push
+
+jobs:
+  bash_etl_insights:
+    runs-on: ubuntu-18.04
+    env:
+      robot_aws_access_key_id:     ${{ secrets.aws_access_key_id }}
+      robot_aws_secret_access_key: ${{ secrets.aws_secret_access_key }}
+      circleci_api_key:            ${{ secrets.circleci_api_key }}
+      influxdb_api_key:            ${{ secrets.influxdb_api_key }}
+      healthchecks_vacuum:         ${{ secrets.healthchecks_vacuum }}
+      env:                         ${{ secrets.env }}
+    steps:
+      - uses: actions/checkout@v1
+      - run: git clone https://github.com/skilbjo/bash-etl.git ~/bash-etl
+      - run: mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
+      - run: cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
