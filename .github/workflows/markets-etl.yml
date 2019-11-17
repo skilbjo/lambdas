@@ -17,8 +17,8 @@ jobs:
       alpha_vantage_api_key:       ${{ secrets.alpha_vantage_api_key }}
       healthchecks_io_api_key:     ${{ secrets.healthchecks_io_api_key }}
       env:                         ${{ secrets.env }}
-      AWS_ACCESS_KEY_ID:           ${{ secrets.aws_access_key_id }}
-      AWS_SECRET_ACCESS_KEY:       ${{ secrets.aws_secret_access_key }}
+      #AWS_ACCESS_KEY_ID:           ${{ secrets.aws_access_key_id }}
+      #AWS_SECRET_ACCESS_KEY:       ${{ secrets.aws_secret_access_key }}
       AWS_REGION:                  ${{ 'us-east-1' }}
     steps:
       - uses: actions/checkout@v1
