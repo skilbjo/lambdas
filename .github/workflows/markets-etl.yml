@@ -1,0 +1,29 @@
+name: markets-etl
+
+on:
+  schedule:
+    - cron:  '0 3 * * 6'
+
+jobs:
+  markets_etl_and_iris:
+    runs-on: ubuntu-18.04
+    env:
+      robot_aws_access_key_id:     ${{ secrets.aws_access_key_id }}
+      robot_aws_secret_access_key: ${{ secrets.aws_secret_access_key }}
+      aws_access_key_id:           ${{ secrets.aws_access_key_id }}
+      aws_secret_access_key:       ${{ secrets.aws_secret_access_key }}
+      jdbc_db_uri:                 ${{ secrets.jdbc_db_uri }}
+      quandl_api_key:              ${{ secrets.quandl_api_key }}
+      alpha_vantage_api_key:       ${{ secrets.alpha_vantage_api_key }}
+      healthchecks_io_api_key:     ${{ secrets.healthchecks_io_api_key }}
+      email:                       ${{ secrets.email }}
+      email_pw:                    ${{ secrets.email_pw }}
+      healthchecks_io_iris:        ${{ secrets.healthchecks_io_iris }}
+      env:                         ${{ secrets.env }}
+    steps:
+      - uses: actions/checkout@v1
+      - run: mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
+      - run: git clone https://github.com/skilbjo/markets-etl.git ~/markets-etl
+      - run: git clone https://github.com/skilbjo/iris.git        ~/iris
+      #- run: cd ~/markets-etl; deploy/bin/run-docker '-m s3.aws-lambda'
+      - run: cd ~/iris; deploy/bin/run-docker 'daily'
