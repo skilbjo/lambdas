@@ -10,6 +10,8 @@ jobs:
     env:
       robot_aws_access_key_id:     ${{ secrets.aws_access_key_id }}
       robot_aws_secret_access_key: ${{ secrets.aws_secret_access_key }}
+      aws_access_key_id:           ${{ secrets.aws_access_key_id }}
+      aws_secret_access_key:       ${{ secrets.aws_secret_access_key }}
       jdbc_db_uri:                 ${{ secrets.jdbc_db_uri }}
       quandl_api_key:              ${{ secrets.quandl_api_key }}
       alpha_vantage_api_key:       ${{ secrets.alpha_vantage_api_key }}
