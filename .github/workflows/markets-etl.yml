@@ -16,6 +16,9 @@ jobs:
       quandl_api_key:              ${{ secrets.quandl_api_key }}
       alpha_vantage_api_key:       ${{ secrets.alpha_vantage_api_key }}
       healthchecks_io_api_key:     ${{ secrets.healthchecks_io_api_key }}
+      email:                       ${{ secrets.email }}
+      email_pw:                    ${{ secrets.email_pw }}
+      healthchecks_io_iris:        ${{ secrets.healthchecks_io_iris }}
       env:                         ${{ secrets.env }}
     steps:
       - uses: actions/checkout@v1
