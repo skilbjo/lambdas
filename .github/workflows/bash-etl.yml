@@ -1,8 +1,8 @@
 name: bash-etl
-on:
-  schedule:
-    - cron:  '0 3 * * *'
-  push
+on: push
+#on:
+  #schedule:
+    #- cron:  '0 3 * * *'
 
 jobs:
   bash_etl_insights:
