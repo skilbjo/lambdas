@@ -1,4 +1,5 @@
-image: bash:5.0
+#image: bash:5.0
+image: cimg/base:stable
 
 before_script:
   - git clone https://github.com/skilbjo/bash-etl.git ~/bash-etl
