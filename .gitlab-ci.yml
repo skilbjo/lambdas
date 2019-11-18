@@ -1,0 +1,15 @@
+image: hudecof/ansible-tests:latest
+
+before_script:
+  - git clone https://github.com/skilbjo/bash-etl.git ~/bash-etl
+  - mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
+
+stages:
+  - run_job
+
+bash-etl-insights:
+  stage: run_job
+  environment:
+    env: prod
+  script:
+    - cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
