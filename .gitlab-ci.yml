@@ -1,4 +1,4 @@
-image: hudecof/ansible-tests:latest
+image: bash:5.0
 
 before_script:
   - git clone https://github.com/skilbjo/bash-etl.git ~/bash-etl
@@ -9,7 +9,5 @@ stages:
 
 bash-etl-insights:
   stage: run_job
-  environment:
-    env: prod
   script:
     - cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
