@@ -1,15 +1,14 @@
-#image: bash:5.0
-#image: docker:19.03.1
+image: docker:19.03.1
 
-#services:
-  #- docker:19.03.1-dind
+services:
+  - docker:19.03.1-dind
 
-#variables:
-  #DOCKER_HOST:   "tcp://docker:2375"
-  #DOCKER_DRIVER: overlay2
-  #DOCKER_IMAGE:  cimg/base:stable
+variables:
+  DOCKER_HOST:   tcp://docker:2375
+  DOCKER_DRIVER: overlay2
 
 before_script:
+  - apt add -U git python3-dev
   - git clone https://github.com/skilbjo/bash-etl.git ~/bash-etl
   - mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
 
