@@ -20,7 +20,6 @@ stages:
 bash-etl-insights:
   stage: run_job
   script:
-    - "echo env is: $env"
     - cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
 
 #markets-etl-and-iris:
