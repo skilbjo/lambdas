@@ -9,7 +9,9 @@ variables:
 
 before_script:
   - apk add -U bash git
-  - git clone https://github.com/skilbjo/bash-etl.git ~/bash-etl
+  - git clone https://github.com/skilbjo/bash-etl.git    ~/bash-etl
+  - git clone https://github.com/skilbjo/markets-etl.git ~/markets-etl
+  - git clone https://github.com/skilbjo/iris.git        ~/iris
   - mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
 
 stages:
