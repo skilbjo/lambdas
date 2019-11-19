@@ -6,7 +6,7 @@ executors:
       - PATH: /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/circleci/.local/bin
     working_directory: ~/lambdas
     machine:
-      image: ubuntu-1604:201903-01
+      image: circleci/classic:latest
 
 jobs:
   markets_etl_and_iris:
@@ -29,7 +29,6 @@ jobs:
       - run: cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
 
 workflows:
-  version: 2
   commit:
     jobs:
       - bash_etl_insights
