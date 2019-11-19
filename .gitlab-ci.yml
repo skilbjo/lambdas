@@ -8,7 +8,7 @@ variables:
   DOCKER_DRIVER: overlay2
 
 before_script:
-  - apk add -U bash git python3-dev
+  - apk add -U git
   - git clone https://github.com/skilbjo/bash-etl.git ~/bash-etl
   - mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
 
@@ -18,6 +18,4 @@ stages:
 bash-etl-insights:
   stage: run_job
   script:
-    - whoami
-    - pwd
     - cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
