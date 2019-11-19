@@ -1,10 +1,16 @@
-version: 2
-jobs:
-  markets_etl_and_iris:
-    working_directory: ~/lambdas
-    machine: true
+version: 2.1
+
+executors:
+  machine:
     environment:
       - PATH: /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/circleci/.local/bin
+    working_directory: ~/lambdas
+    machine:
+      image: circleci/classic:latest
+
+jobs:
+  markets_etl_and_iris:
+    executor: machine
     steps:
       - checkout
       - run: git clone https://github.com/skilbjo/markets-etl.git ~/markets-etl
@@ -14,10 +20,7 @@ jobs:
       - run: cd ~/markets-etl; deploy/bin/run-docker '-m s3.aws-lambda'
       - run: cd ~/iris; deploy/bin/run-docker 'daily'
   bash_etl_insights:
-    working_directory: ~/lambdas
-    machine: true
-    environment:
-      - PATH: /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/circleci/.local/bin
+    executor: machine
     steps:
       - checkout
       - run: git clone https://github.com/skilbjo/bash-etl.git ~/bash-etl
@@ -26,7 +29,9 @@ jobs:
       - run: cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
 
 workflows:
-  version: 2
+  #commit:
+    #jobs:
+      #- bash_etl_insights
   daily:
     jobs:
       - bash_etl_insights
