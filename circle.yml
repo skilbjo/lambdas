@@ -8,33 +8,38 @@ executors:
     machine:
       image: circleci/classic:latest
 
+commands:
+  start-docker:
+    steps:
+      - run: docker info >/dev/null 2>&1 || service docker start
+
 jobs:
-  markets_etl_and_iris:
+  markets-etl-and-iris:
     executor: machine
     steps:
       - checkout
+      - start-docker
       - run: git clone https://github.com/skilbjo/markets-etl.git ~/markets-etl
       - run: git clone https://github.com/skilbjo/iris.git        ~/iris
-      - run: docker info >/dev/null 2>&1 || service docker start
       - run: mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
       - run: cd ~/markets-etl; deploy/bin/run-docker '-m s3.aws-lambda'
       - run: cd ~/iris; deploy/bin/run-docker 'daily'
-  bash_etl_insights:
+  bash-etl-insights:
     executor: machine
     steps:
       - checkout
+      - start-docker
       - run: git clone https://github.com/skilbjo/bash-etl.git ~/bash-etl
-      - run: docker info >/dev/null 2>&1 || service docker start
       - run: mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
       - run: cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
 
 workflows:
-  #commit:
+  #commit:                 # uncomment to run on commits
     #jobs:
-      #- bash_etl_insights
+      #- bash-etl-insights
   daily:
     jobs:
-      - bash_etl_insights
+      - bash-etl-insights
     triggers:
       - schedule:
           cron: '0 3 * * *' # 8pm PST
@@ -42,9 +47,9 @@ workflows:
             branches:
               only:
                 master
-  friday_night:
+  friday-night:
     jobs:
-      - markets_etl_and_iris
+      - markets-etl-and-iris
     triggers:
       - schedule:
           cron: '0 3 * * 6' # 7,8,9pm PST # 0 2,3,4 * * 2-6  # Just leave on Fri so not to run up aws costs
@@ -52,6 +57,3 @@ workflows:
             branches:
               only:
                 master
-  #commit:       # uncomment to run on commits
-    #jobs:
-      #- run_it

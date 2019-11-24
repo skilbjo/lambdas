@@ -9,22 +9,27 @@ variables:
 
 before_script:
   - apk add -U bash git
-  - git clone https://github.com/skilbjo/bash-etl.git    ~/bash-etl
-  - git clone https://github.com/skilbjo/markets-etl.git ~/markets-etl
-  - git clone https://github.com/skilbjo/iris.git        ~/iris
   - mkdir -p ~/.aws; echo '[skilbjo-robot]' >~/.aws/credentials; echo "aws_access_key_id = $robot_aws_access_key_id" >>~/.aws/credentials; echo "aws_secret_access_key = $robot_aws_secret_access_key" >>~/.aws/credentials;
 
 stages:
   - run_job
+  - report
 
 bash-etl-insights:
   stage: run_job
   script:
+    - git clone https://github.com/skilbjo/bash-etl.git    ~/bash-etl
     - cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
 
-#markets-etl-and-iris:
-  #stage: run_job
-  #script:
-    #- echo "$env"
-    #- cd ~/markets-etl; deploy/bin/run-docker '-m s3.aws-lambda'
-    #- cd ~/iris; deploy/bin/run-docker 'daily'
+markets-etl-and-iris:
+  stage: run_job
+  script:
+    - git clone https://github.com/skilbjo/markets-etl.git ~/markets-etl
+    - cd ~/markets-etl; deploy/bin/run-docker '-m s3.aws-lambda'
+    - cd ~/iris; deploy/bin/run-docker 'daily'
+
+iris:
+  stage: report
+  script:
+    - git clone https://github.com/skilbjo/iris.git        ~/iris
+    - cd ~/iris; deploy/bin/run-docker 'daily'
