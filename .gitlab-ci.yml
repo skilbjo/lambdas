@@ -18,9 +18,10 @@ stages:
 bash-etl-insights:on-schedule:
   stage: run_job
   only:
-    - schedules
-  variables:
-    - $schedule == 'daily'
+    refs:
+      - schedules
+    variables:
+      - $schedule == 'daily'
   script:
     - git clone https://github.com/skilbjo/bash-etl.git    ~/bash-etl
     - cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
@@ -28,9 +29,10 @@ bash-etl-insights:on-schedule:
 markets-etl:on-schedule:
   stage: run_job
   only:
-    - schedules
-  variables:
-    - $schedule == 'friday-night'
+    refs:
+      - schedules
+    variables:
+      - $schedule == 'friday-night'
   script:
     - git clone https://github.com/skilbjo/markets-etl.git ~/markets-etl
     - cd ~/markets-etl; deploy/bin/run-docker '-m s3.aws-lambda'
@@ -38,9 +40,10 @@ markets-etl:on-schedule:
 iris:on-schedule:
   stage: report
   only:
-    - schedules
-  variables:
-    - $schedule == 'friday-night'
+    refs:
+      - schedules
+    variables:
+      - $schedule == 'friday-night'
   script:
     - git clone https://github.com/skilbjo/iris.git        ~/iris
     - cd ~/iris; deploy/bin/run-docker 'daily'
