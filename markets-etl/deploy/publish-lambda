@@ -42,7 +42,7 @@ new(){
     --function-name "${app}" \
     --zip-file 'fileb://app.jar' \
     --role arn:aws:iam::470340682667:role/lambda_with_athena \
-    --handler "jobs.aws-lambda" \
+    --handler "s3.aws-lambda" \
     --runtime java8 \
     --timeout 10 \
     --memory-size 360

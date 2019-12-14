@@ -20,16 +20,10 @@ cleanup(){
 copy_files(){
   cleanup
 
-  mkdir -p "${app}/resources" && \
-    cp "${app}/include/log4j.properties" "${app}/resources/log4j.properties"
-
   cp "${src_dir}/project.clj"  "${app}/project.clj"
+  cp -r "${src_dir}/resources" "${app}/resources" \
   cp -r "${src_dir}/src"       "${app}/src" \
     && if [[ -d ${app}/src/benchmark ]]; then rm -rf ${app}/src/benchmark; fi # benchmark has references to test/fixtures ns, which is not copied in
-}
-
-add_aws_lambda_clj(){
-  cp "${app}/include/aws_lambda.clj" "${app}/src/jobs/aws_lambda.clj"
 }
 
 util_clj(){
@@ -173,27 +167,6 @@ sql_clj(){
   echo "$athena" >>"${app}/src/markets_etl/sql.clj"
 }
 
-api_clj(){
-  # fixed in https://github.com/skilbjo/markets-etl/pull/13
-  #sed -i '' 's/ {:pre/ #_{:pre/g' "${app}/src/markets_etl/api.clj"
-  echo ''
-}
-
-project_clj(){
-  sed -i '' -e '1,3d;' "${app}/project.clj"
-
-  local header='(defproject markets-etl "0.1.0"
-  :uberjar-name "markets-etl.jar"
-  :dependencies [[org.clojure/clojure "1.9.0"]
-                 [com.amazonaws/aws-lambda-java-core "1.0.0"]
-                 [com.amazonaws/aws-java-sdk-kms "1.11.98"]
-                 [amazonica "0.3.117" :exclusions [com.amazonaws/aws-java-sdk]]
-                 [org.clojure/data.csv "0.1.4"]'
-
-  echo "$header" | cat - "${app}/project.clj" >temp && \
-    mv temp "${app}/project.clj"
-}
-
 src_files_clj(){
   # get ready to replace the -main and execute! for all jobs
   sed -i '' -e '93,$ d' "${app}/src/jobs/currency.clj"
@@ -274,9 +247,7 @@ src_files_clj(){
 
 add_lambda_wrappers(){
   sql_clj
-  api_clj
   util_clj
-  project_clj
   src_files_clj
 }
 
@@ -285,6 +256,5 @@ rm_unnecessary_files(){
 }
 
 copy_files && \
-  add_aws_lambda_clj && \
   add_lambda_wrappers && \
   rm_unnecessary_files
