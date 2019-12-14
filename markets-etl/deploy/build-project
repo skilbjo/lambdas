@@ -21,9 +21,10 @@ copy_files(){
   cleanup
 
   cp "${src_dir}/project.clj"  "${app}/project.clj"
-  cp -r "${src_dir}/resources" "${app}/resources" \
-  cp -r "${src_dir}/src"       "${app}/src" \
-    && if [[ -d ${app}/src/benchmark ]]; then rm -rf ${app}/src/benchmark; fi # benchmark has references to test/fixtures ns, which is not copied in
+  cp -r "${src_dir}/resources" "${app}/resources"
+  cp -r "${src_dir}/src"       "${app}/src"
+
+  if [[ -d ${app}/src/benchmark ]]; then rm -rf ${app}/src/benchmark; fi # benchmark has references to test/fixtures ns, which is not copied in
 }
 
 util_clj(){
