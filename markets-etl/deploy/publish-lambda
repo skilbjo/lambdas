@@ -2,7 +2,7 @@
 set -eou pipefail
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-app=$(basename $(dirname $dir))
+app="$(basename "$(dirname "$dir")")"
 
 cd "${dir}/.."
 
@@ -10,7 +10,7 @@ build() {
   deploy/build-project
 
   lein uberjar && \
-    cp "target/uberjar/${app}.jar" app.jar
+    cp "target/uberjar/app.jar" app.jar
 }
 
 cleanup() {
@@ -42,7 +42,7 @@ new(){
     --function-name "${app}" \
     --zip-file 'fileb://app.jar' \
     --role arn:aws:iam::470340682667:role/lambda_with_athena \
-    --handler "jobs.aws-lambda" \
+    --handler "s3.aws-lambda" \
     --runtime java8 \
     --timeout 10 \
     --memory-size 360
