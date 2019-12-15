@@ -44,8 +44,8 @@ jobs:
       - checkout
       - run: git clone git@github.com:skilbjo/markets-etl.git ~/markets-etl
       - run: cd markets-etl; deploy/build-project
-      - run: lein uberjar
-      - run: if [[ $CIRCLE_BRANCH == 'master' ]]; deploy/publish-lambda; fi
+      - run: cd markets-etl; lein uberjar
+      - run: if [[ $CIRCLE_BRANCH == 'master' ]]; cd markets-etl; deploy/publish-lambda; fi
 
 workflows:
   commit:
