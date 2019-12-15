@@ -2,7 +2,7 @@
 set -eou pipefail
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-app=$(basename $(dirname $dir))
+app="$(basename "$(dirname "$dir")")"
 
 cd "${dir}/.."
 
@@ -10,7 +10,7 @@ build() {
   deploy/build-project
 
   lein uberjar && \
-    cp "target/uberjar/${app}.jar" app.jar
+    cp "target/uberjar/app.jar" app.jar
 }
 
 cleanup() {
