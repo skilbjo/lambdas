@@ -8,7 +8,7 @@ executors:
     machine:
       image: circleci/classic:latest
   clojure:
-    working_directory: ~/markets-etl
+    working_directory: ~/lambdas
     environment:
       - PATH: /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/circleci/.local/bin:/root/.local/bin
     docker:
