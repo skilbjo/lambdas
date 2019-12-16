@@ -20,7 +20,7 @@ commands:
       - run: docker info >/dev/null 2>&1 || service docker start
   install_aws_cli:
     steps:
-      - run: apt update; apt install -y -qq python3-pip; pip3 install awscli --upgrade --user
+      - run: sudo apt update; sudo apt install -y -qq python3-pip; pip3 install awscli --upgrade --user
 
 jobs:
   markets-etl-and-iris:
