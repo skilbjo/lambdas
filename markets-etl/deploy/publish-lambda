@@ -24,18 +24,11 @@ cleanup() {
 update() {
   build
 
-  if [[ $(whoami) == 'skilbjo' ]]; then
-    aws lambda update-function-code  \
-      --profile personal \
-      --region us-east-1 \
-      --function-name "${app}" \
-      --zip-file 'fileb://app.jar'
-  else
-    aws lambda update-function-code  \
-      --region us-east-1 \
-      --function-name "${app}" \
-      --zip-file 'fileb://app.jar'
-  fi
+  aws lambda update-function-code  \
+    --profile personal \
+    --region us-east-1 \
+    --function-name "${app}" \
+    --zip-file 'fileb://app.jar'
 
   cleanup
 }
