@@ -18,6 +18,9 @@ commands:
   start-docker:
     steps:
       - run: docker info >/dev/null 2>&1 || service docker start
+  install_aws_cli:
+    steps:
+      - run: apt update; apt install -y -qq python3-pip; pip3 install awscli --upgrade --user
 
 jobs:
   markets-etl-and-iris:
@@ -42,6 +45,7 @@ jobs:
     executor: clojure
     steps:
       - checkout
+      - install_aws_cli
       - run: git clone git@github.com:skilbjo/markets-etl.git ~/markets-etl
       - run: cd markets-etl; deploy/build-project
       - run: cd markets-etl; lein uberjar
