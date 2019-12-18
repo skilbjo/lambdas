@@ -28,7 +28,7 @@ update() {
     # for some reason, when running uberjar on linux, the app.jar is 63mb
     # when lein uberjar is run on osx, app.jar is 45m. Unknown reason for the
     # differences
-    aws s3 --profile personal cp app.jar "s3://skilbjo/${app}.jar"
+    aws s3 --profile circleci cp app.jar "s3://skilbjo/${app}.jar"
 
     # Note the --profile circleci flag is for skilbjo jobs inside circleci
     aws lambda update-function-code  \
