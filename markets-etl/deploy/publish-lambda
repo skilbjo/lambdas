@@ -24,11 +24,26 @@ cleanup() {
 update() {
   build
 
-  aws lambda update-function-code  \
-    --profile personal \
-    --region us-east-1 \
-    --function-name "${app}" \
-    --zip-file 'fileb://app.jar'
+  if [[ $(whoami) == 'circleci' ]]; then
+    # for some reason, when running uberjar on linux, the app.jar is 63mb
+    # when lein uberjar is run on osx, app.jar is 45m. Unknown reason for the
+    # differences
+    aws s3 --profile personal cp app.jar "s3://skilbjo/${app}.jar"
+
+    # Note the --profile circleci flag is for skilbjo jobs inside circleci
+    aws lambda update-function-code  \
+      --profile circleci \
+      --region us-east-1 \
+      --function-name "$app" \
+      --s3-bucket skilbjo \
+      --s3-key "${app}.jar"
+  else
+    aws lambda update-function-code  \
+      --profile personal \
+      --region us-east-1 \
+      --function-name "$app" \
+      --zip-file 'fileb://app.jar'
+  fi
 
   cleanup
 }
@@ -39,7 +54,7 @@ new(){
   aws lambda create-function \
     --profile personal \
     --region us-east-1 \
-    --function-name "${app}" \
+    --function-name "$app" \
     --zip-file 'fileb://app.jar' \
     --role arn:aws:iam::470340682667:role/lambda_with_athena \
     --handler "s3.aws-lambda" \
