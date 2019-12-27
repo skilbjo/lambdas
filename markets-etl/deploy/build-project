@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -eou pipefail
 
-dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"  # don't cd yet; to set app var
 app="$(basename "$(dirname "$dir")")"
 src_dir=''
+
 case "$(whoami)" in
   (skilbjo)         src_dir='/Users/skilbjo/dev/markets-etl' ;;
   ('john.skilbeck') src_dir='/Users/john.skilbeck/dev/markets-etl' ;;
@@ -25,11 +26,11 @@ copy_files(){
   cp -r "${src_dir}/resources" "${app}/resources"
   cp -r "${src_dir}/src"       "${app}/src"
 
-  if [[ -d ${app}/src/benchmark ]]; then rm -rf ${app}/src/benchmark; fi # benchmark has references to test/fixtures ns, which is not copied in
 }
 
 rm_unnecessary_files(){
   if [[ -d ${app}/src/backfill   ]]; then rm -r ${app}/src/backfill; fi
+  if [[ -d ${app}/src/benchmark ]]; then rm -rf ${app}/src/benchmark; fi # benchmark has references to test/fixtures ns, which is not copied in
 }
 
 copy_files && \
