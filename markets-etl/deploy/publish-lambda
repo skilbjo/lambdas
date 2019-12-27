@@ -2,7 +2,7 @@
 set -eou pipefail
 
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )" && cd "$dir"
-app="$(basename "$(dirname "$dir")")"
+app="$(basename "$dir")"
 
 build() {
   deploy/build-project
