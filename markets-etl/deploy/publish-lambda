@@ -22,8 +22,6 @@ cleanup() {
 update() {
   build
 
-  whoami # delete me
-
   if [[ $(whoami) == 'circleci' ]]; then
     # for some reason, when running uberjar on linux, the app.jar is 63mb
     # when lein uberjar is run on osx, app.jar is 45m. Unknown reason for the
