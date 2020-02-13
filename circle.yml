@@ -64,11 +64,11 @@ jobs:
       - run: if [[ $CIRCLE_BRANCH == 'master' ]]; then cd ~/lambdas; cd markets-etl; deploy/publish-lambda; fi
 
 workflows:
-  commit:
-    jobs:
+  #commit:
+    #jobs:
       #- markets-etl-lambda-build-and-deploy
       #- bash-etl-insights # uncomment to run on commits
-      - markets-etl-and-iris
+      #- markets-etl-and-iris
 
   daily:
     jobs:
