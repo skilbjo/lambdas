@@ -67,7 +67,8 @@ workflows:
   commit:
     jobs:
       #- markets-etl-lambda-build-and-deploy
-      - bash-etl-insights # uncomment to run on commits
+      #- bash-etl-insights # uncomment to run on commits
+      - markets-etl-and-iris
 
   daily:
     jobs:
