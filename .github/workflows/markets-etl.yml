@@ -15,6 +15,8 @@ jobs:
       jdbc_db_uri:                 ${{ secrets.jdbc_db_uri }}
       quandl_api_key:              ${{ secrets.quandl_api_key }}
       alpha_vantage_api_key:       ${{ secrets.alpha_vantage_api_key }}
+      intrinio_api_key:            ${{ secrets.intrinio_api_key }}
+      tiingo_api_key:              ${{ secrets.tiingo_api_key }}
       healthchecks_io_api_key:     ${{ secrets.healthchecks_io_api_key }}
       email:                       ${{ secrets.email }}
       email_pw:                    ${{ secrets.email_pw }}
