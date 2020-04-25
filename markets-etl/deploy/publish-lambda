@@ -4,23 +4,27 @@ set -eou pipefail
 dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )" && cd "$dir"
 app="$(basename "$dir")"
 
-build() {
+ensure_uberjar() {
   deploy/build-project
 
-  lein uberjar && \
-    cp "target/uberjar/app.jar" app.jar
+  if [[ ! -f target/uberjar/app.jar ]]; then
+    lein uberjar
+  fi
+
+  cp "target/uberjar/app.jar" app.jar
 }
 
 cleanup() {
-  if [[ -f app.jar     ]]; then rm    app.jar; fi
-  if [[ -f project.clj ]]; then rm    project.clj; fi
-  if [[ -d target      ]]; then rm -r target; fi
-  if [[ -d src         ]]; then rm -r src; fi
-  if [[ -d resources   ]]; then rm -r resources; fi
+  if [[ -f app.jar     ]]; then            rm    app.jar; fi
+  if [[ -f target/uberjar/app.jar ]]; then rm    target/uberjar/app.jar; fi
+  if [[ -f project.clj ]]; then            rm    project.clj; fi
+  if [[ -d target      ]]; then            rm -r target; fi
+  if [[ -d src         ]]; then            rm -r src; fi
+  if [[ -d resources   ]]; then            rm -r resources; fi
 }
 
 update() {
-  build
+  ensure_uberjar
 
   if [[ $(whoami) == 'circleci' ]]; then
     # for some reason, when running uberjar on linux, the app.jar is 63mb
@@ -48,7 +52,7 @@ update() {
 }
 
 new(){
-  build
+  ensure_uberjar
 
   aws lambda create-function \
     --profile personal \

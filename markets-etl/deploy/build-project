@@ -25,11 +25,10 @@ copy_files(){
   cp "${src_dir}/project.clj"  "${app}/project.clj"
   cp -r "${src_dir}/resources" "${app}/resources"
   cp -r "${src_dir}/src"       "${app}/src"
-
 }
 
 rm_unnecessary_files(){
-  if [[ -d ${app}/src/backfill   ]]; then rm -r ${app}/src/backfill; fi
+  if [[ -d ${app}/src/backfill  ]]; then rm -r ${app}/src/backfill;   fi
   if [[ -d ${app}/src/benchmark ]]; then rm -rf ${app}/src/benchmark; fi # benchmark has references to test/fixtures ns, which is not copied in
 }
 
