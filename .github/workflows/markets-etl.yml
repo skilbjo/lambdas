@@ -2,9 +2,9 @@ name: markets-etl
 
 on: push
 
-on:
-  - schedule:
-    - cron:  '0 3 * * 6'
+#on:
+  #- schedule:
+    #- cron:  '0 3 * * 6'
 
 jobs:
   markets_etl_and_iris:
