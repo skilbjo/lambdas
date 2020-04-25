@@ -1,7 +1,8 @@
 name: markets-etl
 
 on:
-  schedule:
+  - push
+  - schedule:
     - cron:  '0 3 * * 6'
 
 jobs:
