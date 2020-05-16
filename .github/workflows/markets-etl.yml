@@ -14,6 +14,7 @@ jobs:
       aws_access_key_id:           ${{ secrets.aws_access_key_id }}
       aws_secret_access_key:       ${{ secrets.aws_secret_access_key }}
       jdbc_db_uri:                 ${{ secrets.jdbc_db_uri }}
+      fred_api_key:                ${{ secrets.fred_api_key }}
       quandl_api_key:              ${{ secrets.quandl_api_key }}
       alpha_vantage_api_key:       ${{ secrets.alpha_vantage_api_key }}
       intrinio_api_key:            ${{ secrets.intrinio_api_key }}
