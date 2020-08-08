@@ -75,19 +75,19 @@ workflows:
       - bash-etl-insights
     triggers:
       - schedule:
-          cron: '0 3 * * *' # 9pm PST
-          filters:
-            branches:
-              only:
-                master
+        cron: '0 3 * * *' # 9pm PST
+        filters:
+          branches:
+            only:
+              master
 
   friday-night:
     jobs:
       - markets-etl-and-iris
     triggers:
       - schedule:
-          cron: '0 5 * * 6' # 7pm PST (6 = 5, prior day); also just leave on Fri so not to run up aws costs
-          filters:
-            branches:
-              only:
-                master
+        cron: '0 5 5 * *' # 10pm PST (6 = 5, prior day); prior setting: 0 5 * * 6
+        filters:
+          branches:
+            only:
+              master
