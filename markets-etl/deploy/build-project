@@ -7,7 +7,6 @@ src_dir=''
 
 case "$(whoami)" in
   (skilbjo)         src_dir='/Users/skilbjo/dev/markets-etl' ;;
-  ('john.skilbeck') src_dir='/Users/john.skilbeck/dev/markets-etl' ;;
   ('circleci')      src_dir='/home/circleci/markets-etl' ;;
 esac
 
