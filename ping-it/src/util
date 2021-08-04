@@ -15,7 +15,7 @@ _git(){
   set -u
 
   git config user.name "skilbjo"
-  git config user.email "john.skilbeck@gmail.com"
+  git config user.email "skilbjo@gmail.com"
   git config push.default simple
 }
 
