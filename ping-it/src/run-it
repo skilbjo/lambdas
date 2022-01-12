@@ -14,7 +14,7 @@ setup(){
   if [[ $(whoami) == 'sbx_'* ]]; then rm -rf "${tmp_dir}/"*; fi   # Needed, or clone will fail
 
   install_dependencies
-  _decrypt_secrets
+  # _decrypt_secrets # save on kms; $1/month
 
   mkdir -p "${tmp_dir}/ping-it"
   git clone https://github.com/skilbjo/ping-it.git "${tmp_dir}/ping-it"

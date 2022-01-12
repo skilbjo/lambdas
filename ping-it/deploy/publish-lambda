@@ -16,11 +16,11 @@ add_awscli(){
     set +u
     source virtual-env/bin/activate
     set -u
-    pip install awscli # add any addtl libraries here; or requirements.txt
+    pip install awscli===1.16.314 # add any addtl libraries here; or requirements.txt
     rsync -va "virtual-env/bin/aws" aws
     perl -pi -e '$_ = "#!/usr/bin/python\n" if $. == 1' aws
     zip -r9 "$zipfile" aws
-    cd "virtual-env/lib/python2.7/site-packages"; zip -r9 "$zipfile" .
+    cd "virtual-env/lib/python3.9/site-packages"; zip -r9 "$zipfile" .
   )
 }
 

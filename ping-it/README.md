@@ -18,10 +18,17 @@ was downloaded here: <https://github.com/lambci/lambci/tree/master/vendor>
 deploy/build-project
 ```
 
+or
+
+```
+rm -rf app.zip tmp; ./deploy/publish-lambda
+```
+
 ## config
 ### env vars
 ```bash
-export github_token_encrypted=''
+export github_token_encrypted='' # with kms
+export github_token='' # without kms
 export hchk_ping_it=''
 export slack_api_key=''
 ```
