@@ -1,7 +1,9 @@
 image: docker:19.03.1
 
 services:
-  - docker:19.03.1-dind
+  # - docker:19.03.1-dind
+  - name: docker:dind
+    alias: docker
 
 variables:
   DOCKER_HOST:   tcp://docker:2375
