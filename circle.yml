@@ -16,7 +16,7 @@ executors:
       #- PATH: /usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/circleci/.local/bin
     <<: *environment
     machine:
-      image: ubuntu-2004:202010-01 # https://circleci.com/docs/executor-intro#linux-vm
+      image: ubuntu-2204:current # https://circleci.com/developer/machine/image/ubuntu-2204 -or- https://circleci.com/docs/executor-intro#linux-vm
   clojure:
     working_directory: *dir
     <<: *environment
