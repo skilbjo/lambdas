@@ -70,16 +70,16 @@ workflows:
       #- bash-etl-insights # uncomment to run on commits
       #- markets-etl-and-iris
 
-  daily:
-    jobs:
-      - bash-etl-insights
-    triggers:
-      - schedule:
-        # cron: '0 3 * * *' # 9pm PST # failing because of outdated docker version: upgrade of dockerfile isn't working, fuck this
-          filters:
-            branches:
-              only:
-                master
+  # daily:
+    # jobs:
+      # - bash-etl-insights
+    # triggers:
+      # - schedule:
+          # cron: '0 3 * * *' # 9pm PST # failing because of outdated docker version: upgrade of dockerfile isn't working, fuck this
+          # filters:
+            # branches:
+              # only:
+                # master
 
   friday-night:
     jobs:
