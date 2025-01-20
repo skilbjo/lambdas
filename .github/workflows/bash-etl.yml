@@ -6,7 +6,7 @@ on:
 
 jobs:
   bash_etl_insights:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       robot_aws_access_key_id:     ${{ secrets.aws_access_key_id }}
       robot_aws_secret_access_key: ${{ secrets.aws_secret_access_key }}
