@@ -2,7 +2,7 @@ name: bash-etl
 
 on:
   schedule:
-    - cron:  '0 3 * * *'
+    - cron:  '1 1 1 1 1' # never
 
 jobs:
   bash_etl_insights:
