@@ -17,16 +17,16 @@ stages:
   - run_job
   - report
 
-bash-etl-insights:on-schedule:
-  stage: run_job
-  only:
-    refs:
-      - schedules
-    variables:
-      - $schedule == 'daily'
-  script:
-    - git clone https://github.com/skilbjo/bash-etl.git    ~/bash-etl
-    - cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
+# bash-etl-insights:on-schedule:
+  # stage: run_job
+  # only:
+    # refs:
+      # - schedules
+    # variables:
+      # - $schedule == 'daily'
+  # script:
+    # - git clone https://github.com/skilbjo/bash-etl.git    ~/bash-etl
+    # - cd ~/bash-etl; db_uri='none' deploy/bin/run-docker 'insights' # db_uri set to none is important for markets_etl_and_iris path
 
 markets-etl:on-schedule:
   stage: run_job
